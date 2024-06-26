@@ -20,13 +20,44 @@ document.addEventListener('DOMContentLoaded', (event) => {
         pipeUp.src = "images/tile-E.png";
         pipeBottom.src = "images/tile-SW.png";
 
+
+        let x=10;
+        let y=150;
+        let gravity  = 2;
+
+        function muveUp(event){
+            switch(event.key){
+                case 'w':
+                    y-=50;
+                    break;
+                case 's':
+                    y+=50;
+                    break;
+                case 'a':
+                    x-=50;
+                    break;
+                case 'd':
+                    x+=50
+                    break;
+            }
+        }
+
+        document.addEventListener("keydown",muveUp)
+        
+
         // Функция для рисования на canvas
         function draw() {
+            ctx.clearRect(0, 0, canvasElements[0].width, canvasElements[0].height);
             ctx.drawImage(bg, 0, 0);
-            ctx.drawImage(fg, 100, 0);
-            ctx.drawImage(bird, 10, 150);
-            ctx.drawImage(pipeUp, 100, 0);
-            ctx.drawImage(pipeBottom, 100, 200);
+            ctx.drawImage(fg, 700,  0);
+            ctx.drawImage(bird, x, y);
+            ctx.drawImage(pipeUp, 200, 0);
+            ctx.drawImage(pipeBottom, 200, 400);
+            
+            if (y<= 400){
+                y  += gravity;
+            }
+            requestAnimationFrame(draw)
         }
 
         // Вызываем функцию draw после загрузки последнего изображения
