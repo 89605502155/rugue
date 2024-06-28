@@ -15,13 +15,12 @@ export class User {
     x: number;
     y: number;
     gravity: number;
-    event: any;
     caps: MoveTabs;
     verticalStep: number;
     horizontalStep: number;
     person: HTMLImageElement;
     constructor(roadToPicture:string, x: number, y: number, gravity: number,
-         event: any,caps:MoveTabs,verticalStep:number,
+        caps:MoveTabs,verticalStep:number,
         horizontalStep:number){
         this.person = new Image();
         this.person.src=roadToPicture;
@@ -29,13 +28,12 @@ export class User {
         this.x=x;
         this.y=y;
         this.gravity=gravity;
-        this.event=event;
         this.caps=caps;
         this.verticalStep=verticalStep;
         this.horizontalStep=horizontalStep;
     }
-    muveUp(){
-        switch(this.event.key){
+    muveUp = (event: KeyboardEvent) =>{
+        switch(event.key){
             case this.caps.Up:
                 this.y-=this.verticalStep;
                 break;
@@ -49,5 +47,7 @@ export class User {
                 this.x+=this.horizontalStep;
                 break;
         }
-    }
+    };
+    
+    
 }

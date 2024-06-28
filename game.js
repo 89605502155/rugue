@@ -25,26 +25,26 @@ document.addEventListener('DOMContentLoaded', (event) => {
         pipeBottom.src = "images/tile-SW.png";
 
 
-        // let x=10;
-        // let y=150;
-        // let gravity  = 2;
+        let x=10;
+        let y=150;
+        let gravity  = 2;
 
-        // function muveUp(event){
-        //     switch(event.key){
-        //         case 'w':
-        //             y-=50;
-        //             break;
-        //         case 's':
-        //             y+=50;
-        //             break;
-        //         case 'a':
-        //             x-=50;
-        //             break;
-        //         case 'd':
-        //             x+=50
-        //             break;
-        //     }
-        // }
+        function muveUp(event){
+            switch(event.key){
+                case 'w':
+                    y-=50;
+                    break;
+                case 's':
+                    y+=50;
+                    break;
+                case 'a':
+                    x-=50;
+                    break;
+                case 'd':
+                    x+=50
+                    break;
+            }
+        }
 
         document.addEventListener("keydown",user.muveUp)
         

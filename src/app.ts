@@ -1,11 +1,11 @@
-import { MoveTabs, User } from "./classes/user";
+import { MoveTabs, User } from "./classes/user.js";
 
 
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', (event: Event) => {
     const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
     let ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     let userTabs: MoveTabs = new MoveTabs('w','s','d','a');
-    const user: User = new User("images/tile-P.png",10,150,2,event,userTabs,50,50)
+    const user: User = new User("images/tile-P.png",10,150,2,userTabs,50,50)
     const bg = new Image();
     const fg = new Image();
     const pipeUp = new Image();
