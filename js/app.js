@@ -4,26 +4,14 @@ import { MoveTabs, User } from "./classes/user.js";
 document.addEventListener('DOMContentLoaded', (event) => {
     const canvas = document.getElementById('myCanvas');
     let ctx = canvas.getContext("2d");
-    let userTabs = new MoveTabs('w', 's', 'd', 'a');
-    let userSrc = [];
-    for (let i = 0; i < 6; i++) {
-        userSrc.push("images/player/tile-P-" + (i + 1) + ".png");
-    }
-    const user = new User({ roadToPicture: userSrc, x: 10,
-        y: 150, verticalForce: 50, horizontalForce: 50, horizontalBoost: 0,
-        verticalBoost: 0, horizontalVelocity: 0, verticalVelocity: 0,
-        bodyWeight: 2, currentIndexPicture: 0, speedPictureChange: 2 }, userTabs, { helth: 100, isDead: false,
-        maxHelth: 100, minHelth: 0 });
-    const userKinematic = new Kinematics(user, 0.3, 0.3);
+    let player = generatePlayer();
+    const user = player[0];
+    const userKinematic = player[1];
+    let enemy = generateEnemy();
+    const enemyOne = enemy[0];
+    const enemyKinematic = enemy[1];
     let enemyScr = [];
-    for (let i = 0; i < 4; i++) {
-        enemyScr.push("images/firstEnemy/tile-E-" + (i + 1) + ".png");
-    }
-    const enemyOne = new Enemy({ roadToPicture: enemyScr, x: 0,
-        y: 200, verticalForce: 0, horizontalForce: 0, horizontalBoost: 0,
-        verticalBoost: 0, horizontalVelocity: 10, verticalVelocity: 0,
-        bodyWeight: 2, currentIndexPicture: 0, speedPictureChange: 5 }, { helth: 100, isDead: false, maxHelth: 100, minHelth: 0 });
-    const enemyKinematic = new Kinematics(enemyOne, 0.3, 0.3);
+    // 30 * 12
     const bg = new Image();
     const fg = new Image();
     const pipeBottom = new Image();
@@ -85,3 +73,29 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
     pipeBottom.onload = draw;
 });
+function generatePlayer() {
+    let userTabs = new MoveTabs('w', 's', 'd', 'a');
+    let userSrc = [];
+    for (let i = 0; i < 6; i++) {
+        userSrc.push("images/player/tile-P-" + (i + 1) + ".png");
+    }
+    const user = new User({ roadToPicture: userSrc, x: 10,
+        y: 150, verticalForce: 50, horizontalForce: 50, horizontalBoost: 0,
+        verticalBoost: 0, horizontalVelocity: 0, verticalVelocity: 0,
+        bodyWeight: 2, currentIndexPicture: 0, speedPictureChange: 2 }, userTabs, { helth: 100, isDead: false,
+        maxHelth: 100, minHelth: 0 });
+    const userKinematic = new Kinematics(user, 0.3, 0.3);
+    return [user, userKinematic];
+}
+function generateEnemy() {
+    let enemyScr = [];
+    for (let i = 0; i < 4; i++) {
+        enemyScr.push("images/firstEnemy/tile-E-" + (i + 1) + ".png");
+    }
+    const enemyOne = new Enemy({ roadToPicture: enemyScr, x: 0,
+        y: 200, verticalForce: 0, horizontalForce: 0, horizontalBoost: 0,
+        verticalBoost: 0, horizontalVelocity: 10, verticalVelocity: 0,
+        bodyWeight: 2, currentIndexPicture: 0, speedPictureChange: 5 }, { helth: 100, isDead: false, maxHelth: 100, minHelth: 0 });
+    const enemyKinematic = new Kinematics(enemyOne, 0.3, 0.3);
+    return [enemyOne, enemyKinematic];
+}

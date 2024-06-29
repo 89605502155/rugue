@@ -19,8 +19,8 @@ export class DrawMovingObject {
         this.person = param.person;
         this.roadToPicture= param.roadToPicture;
         this.currentIndexPicture=param.currentIndexPicture;
-        this.speedPictureChange=5;
-        this.speedMarker=5;
+        this.speedPictureChange=param.speedPictureChange;
+        this.speedMarker=param.speedPictureChange;
     }
     draw(ctx: CanvasRenderingContext2D) {
         ctx.save();
