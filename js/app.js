@@ -1,29 +1,33 @@
 import { Enemy } from "./classes/enemy.js";
+import { Block, MapField, Material } from "./classes/matrix.js";
 import { Kinematics } from "./classes/phisics.js";
 import { MoveTabs, User } from "./classes/user.js";
 document.addEventListener('DOMContentLoaded', (event) => {
     const canvas = document.getElementById('myCanvas');
     let ctx = canvas.getContext("2d");
+    let mapField = new MapField(canvas.width, canvas.height, 50, 30);
+    let stone = new Block(Material.StaticStone, 10, 50, 100, 150);
+    let isPaintStone = mapField.appendObjectBuild(stone);
+    console.log(isPaintStone);
     let player = generatePlayer();
     const user = player[0];
     const userKinematic = player[1];
     let enemy = generateEnemy();
     const enemyOne = enemy[0];
     const enemyKinematic = enemy[1];
-    let enemyScr = [];
     // 30 * 12
-    const bg = new Image();
-    const fg = new Image();
-    const pipeBottom = new Image();
-    bg.src = "images/tile-.png";
+    // const bg = new Image();
+    const fg = new Image(50, 150);
+    // const pipeBottom = new Image();
+    // bg.src = "images/tile-.png";
     fg.src = "images/tile-W.png";
-    pipeBottom.src = "images/tile-SW.png";
+    // pipeBottom.src = "images/tile-SW.png";
     document.addEventListener("keydown", user.muveUp);
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(bg, 0, 0);
-        ctx.drawImage(fg, 700, 0);
-        ctx.drawImage(pipeBottom, 200, 400);
+        // ctx.drawImage(bg, 0, 0);
+        ctx.drawImage(fg, 10, 50, 50, 150);
+        // ctx.drawImage(pipeBottom, 200, 400);
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord(enemyOne.person.width, enemyOne.person.height, (x0, x1, y0, y1, w, h) => {
             if (y1 + enemyOne.person.height <= canvas.height && y1 >= 0) {
@@ -71,7 +75,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         user.draw(ctx);
         requestAnimationFrame(draw);
     }
-    pipeBottom.onload = draw;
+    fg.onload = draw;
 });
 function generatePlayer() {
     let userTabs = new MoveTabs('w', 's', 'd', 'a');
