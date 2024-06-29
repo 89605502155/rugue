@@ -1,4 +1,4 @@
-export class DrawHuman {
+export class DrawMovingObject {
     constructor(param) {
         this.horizontalVelocity = param.horizontalVelocity;
         this.x = param.x;
@@ -10,14 +10,20 @@ export class DrawHuman {
         if (this.horizontalVelocity < 0) {
             ctx.scale(-1, 1);
             ctx.drawImage(this.person, -this.x - this.person.width, this.y);
+            console.log(-this.x - this.person.width);
+            // ctx.drawImage(this.person, this.x- this.person.width, this.y);
         }
         else {
             ctx.drawImage(this.person, this.x, this.y);
+            console.log(this.x);
         }
         ctx.restore();
     }
+    getObjectArea() {
+        return [this.x, this.y, this.person.width, this.person.height];
+    }
 }
-export class Human extends DrawHuman {
+export class MobileObject extends DrawMovingObject {
     constructor(param) {
         super(param);
         this.roadToPicture = param.roadToPicture;

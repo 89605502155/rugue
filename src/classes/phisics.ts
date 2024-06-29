@@ -1,4 +1,4 @@
-import { KinematicInterface } from "./user";
+import { KinematicInterface } from "./user.js";
 
 
 export class Kinematics{

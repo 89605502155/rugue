@@ -1,9 +1,9 @@
-import { Human } from './human.js';
-export class Enemy extends Human {
-    constructor(param) {
+import { Helth } from './helth.js';
+export class Enemy extends Helth {
+    constructor(param, helthParam) {
         const person = new Image();
         person.src = param.roadToPicture;
-        super(Object.assign(Object.assign({}, param), { person }));
+        super(Object.assign(Object.assign({}, param), { person }), Object.assign({}, helthParam));
         this.person = person;
         this.roadToPicture = param.roadToPicture;
         this.x = param.x;

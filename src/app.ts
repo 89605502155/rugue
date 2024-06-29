@@ -11,13 +11,13 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
     const user: User = new User({roadToPicture:"images/tile-P.png",x:10,
         y:150,verticalForce:50, horizontalForce:50, horizontalBoost:0,
         verticalBoost:0,horizontalVelocity:0,verticalVelocity:0,
-        bodyWeight:2},userTabs);
+        bodyWeight:2},userTabs,{helth:100,isDead:false,maxHelth:100,minHelth:0});
     const userKinematic = new Kinematics(user,0.3,0.3)
 
     const enemyOne:Enemy=new Enemy({roadToPicture:"images/tile-E.png",x:0,
         y:200,verticalForce:0, horizontalForce:0, horizontalBoost:0,
         verticalBoost:0,horizontalVelocity:10,verticalVelocity:0,
-        bodyWeight:2});
+        bodyWeight:2},{helth:100,isDead:false,maxHelth:100,minHelth:0});
     const enemyKinematic = new Kinematics(enemyOne,0.3,0.3)
 
     const bg = new Image();

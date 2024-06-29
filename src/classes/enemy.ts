@@ -1,6 +1,6 @@
-import {  Human } from './human.js';
+import { Helth, HelthInput } from './helth.js';
 
-export interface HumanDrawInput{
+export interface MovingObjectDrawInput{
     roadToPicture:string;
     x: number;
     y: number;
@@ -13,7 +13,7 @@ export interface HumanDrawInput{
     person: HTMLImageElement;
     bodyWeight: number;
 }
-export interface HumanInput{
+export interface MovingObjectInput{
     roadToPicture:string;
     x: number;
     y: number;
@@ -25,7 +25,7 @@ export interface HumanInput{
     verticalVelocity: number;
     bodyWeight: number;
 }
-export class Enemy extends Human {
+export class Enemy extends Helth {
     roadToPicture:string;
     x: number;
     y: number;
@@ -39,10 +39,10 @@ export class Enemy extends Human {
     bodyWeight: number;
     constHorizontalVelocity: number;
     constVerticalVelocity: number;
-    constructor(param: HumanInput){
+    constructor(param: MovingObjectInput,helthParam: HelthInput){
         const person = new Image();
         person.src = param.roadToPicture;
-        super({...param,person});
+        super({...param,person},{ ...helthParam });
         this.person=person;
         this.roadToPicture=param.roadToPicture;
         this.x=param.x;

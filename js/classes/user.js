@@ -1,4 +1,4 @@
-import { Human } from "./human.js";
+import { Helth } from "./helth.js";
 export class MoveTabs {
     constructor(Up, Down, Right, Left) {
         this.Up = Up;
@@ -7,11 +7,11 @@ export class MoveTabs {
         this.Left = Left;
     }
 }
-export class User extends Human {
-    constructor(param, caps) {
+export class User extends Helth {
+    constructor(param, caps, helthParam) {
         const person = new Image();
         person.src = param.roadToPicture;
-        super(Object.assign(Object.assign({}, param), { person }));
+        super(Object.assign(Object.assign({}, param), { person }), Object.assign({}, helthParam));
         this.muveUp = (event) => {
             switch (event.key) {
                 case this.caps.Up:

@@ -1,13 +1,23 @@
-class Helth {
+import { MovingObjectDrawInput } from "./enemy.js";
+import { MobileObject } from "./human.js";
+
+export interface HelthInput{
     helth:number;
     isDead:boolean;
     minHelth:number;
     maxHelth:number;
-    constructor(helth:number,minHelth:number=0,maxHelth:number=100){
-        this.helth=helth;
-        this.minHelth=minHelth;
-        this.maxHelth=maxHelth;
-        this.isDead=false;
+}
+export class Helth extends MobileObject {
+    helth:number;
+    isDead:boolean;
+    minHelth:number;
+    maxHelth:number;
+    constructor(param: MovingObjectDrawInput,helthParam:HelthInput){
+        super(param);
+        this.helth=helthParam.helth;
+        this.minHelth=helthParam.minHelth;
+        this.maxHelth=helthParam.maxHelth;
+        this.isDead=helthParam.isDead;
     }
     setDamage(damage:number){
         if (this.helth-damage<=this.minHelth){

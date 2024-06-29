@@ -1,5 +1,5 @@
-import { HumanInput } from "./enemy.js";
-import { Human } from "./human.js";
+import { MovingObjectInput } from "./enemy.js";
+import { Helth, HelthInput } from "./helth.js";
 
 export class MoveTabs{
     Up: string;
@@ -27,7 +27,7 @@ export interface KinematicInterface{
 }
 
 
-export class User extends Human {
+export class User extends Helth {
     roadToPicture:string;
     x: number;
     y: number;
@@ -40,10 +40,10 @@ export class User extends Human {
     verticalVelocity: number;
     person: HTMLImageElement;
     bodyWeight: number;
-    constructor(param: HumanInput,caps:MoveTabs){
+    constructor(param: MovingObjectInput,caps:MoveTabs,helthParam: HelthInput){
         const person = new Image();
         person.src = param.roadToPicture;
-        super({...param,person});
+        super({...param,person},{...helthParam});
         this.caps=caps;
         this.x=param.x;
         this.y=param.y;

@@ -1,7 +1,7 @@
-import { HumanDrawInput } from "./enemy.js";
+import {  MovingObjectDrawInput } from "./enemy.js";
 import { HumanDraw, KinematicInterface } from "./user.js";
 
-export class DrawHuman {
+export class DrawMovingObject {
     horizontalVelocity: number;
     x: number;
     y: number;
@@ -17,14 +17,14 @@ export class DrawHuman {
         if (this.horizontalVelocity<0) {
             ctx.scale(-1, 1);
             ctx.drawImage(this.person, -this.x - this.person.width, this.y);
+            // ctx.drawImage(this.person, this.x- this.person.width, this.y);
         } else {
             ctx.drawImage(this.person, this.x, this.y);
         }
         ctx.restore();
     }
 }
-
-export class Human extends DrawHuman {
+export class MobileObject extends DrawMovingObject {
     roadToPicture:string;
     x: number;
     y: number;
@@ -36,11 +36,11 @@ export class Human extends DrawHuman {
     verticalVelocity: number;
     person: HTMLImageElement;
     bodyWeight: number;
-    constructor(param: HumanDrawInput){
+    constructor(param: MovingObjectDrawInput){
         super(param);
         this.roadToPicture  = param.roadToPicture;
-        this.x  = param.x;
-        this.y   = param.y;
+        this.x = param.x;
+        this.y = param.y;
         this.verticalForce= param.verticalForce;
         this.horizontalForce= param.horizontalForce;
         this.horizontalBoost= param.horizontalBoost;
@@ -74,5 +74,25 @@ export class Human extends DrawHuman {
             bodyWeight:this.bodyWeight
         }
     };
+    getObjectArea():[number,number,number,number]{
+        return [this.x,this.y,this.person.width,this.person.height];
+    }
 };
+export enum ColliderShapes{
+    Circle,
+    Rectangle,
+    Triangle,
+    Elipse,
+}
+export class GetPointsObject{
+    typeShape: ColliderShapes;
+    constructor(param: ColliderShapes){
+        this.typeShape= param;
+    }
+    getPoints(){
+
+    }
+    #
+
+}
 

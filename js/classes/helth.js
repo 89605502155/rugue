@@ -1,10 +1,11 @@
-"use strict";
-class Helth {
-    constructor(helth, minHelth = 0, maxHelth = 100) {
-        this.helth = helth;
-        this.minHelth = minHelth;
-        this.maxHelth = maxHelth;
-        this.isDead = false;
+import { MobileObject } from "./human.js";
+export class Helth extends MobileObject {
+    constructor(param, helthParam) {
+        super(param);
+        this.helth = helthParam.helth;
+        this.minHelth = helthParam.minHelth;
+        this.maxHelth = helthParam.maxHelth;
+        this.isDead = helthParam.isDead;
     }
     setDamage(damage) {
         if (this.helth - damage <= this.minHelth) {
