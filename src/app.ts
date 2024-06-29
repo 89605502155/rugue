@@ -29,11 +29,12 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
     pipeBottom.src = "images/tile-SW.png";
 
     document.addEventListener("keydown",user.muveUp)
-
+    
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(bg, 0, 0);
         ctx.drawImage(fg, 700,  0);
+        ctx.drawImage(pipeBottom, 200, 400);
 
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord((x0,x1,y0,y1)=>{
@@ -57,8 +58,6 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
         enemyOne.calcVelocity();
         enemyOne.draw(ctx);
 
-        ctx.drawImage(pipeBottom, 200, 400);
-        // ctx.drawImage(user.person, user.x, user.y);
         
         userKinematic.update(user)
         userKinematic.calcNewCoord((x0,x1,y0,y1)=>{

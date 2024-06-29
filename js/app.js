@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(bg, 0, 0);
         ctx.drawImage(fg, 700, 0);
+        ctx.drawImage(pipeBottom, 200, 400);
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord((x0, x1, y0, y1) => {
             if (y1 + enemyOne.person.height <= canvas.height && y1 >= 0) {
@@ -50,8 +51,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         enemyOne.updateKinematic(enemyKinematic);
         enemyOne.calcVelocity();
         enemyOne.draw(ctx);
-        ctx.drawImage(pipeBottom, 200, 400);
-        // ctx.drawImage(user.person, user.x, user.y);
         userKinematic.update(user);
         userKinematic.calcNewCoord((x0, x1, y0, y1) => {
             if (y1 + user.person.height <= canvas.height && y1 >= 0) {
