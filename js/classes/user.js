@@ -10,7 +10,7 @@ export class MoveTabs {
 export class User extends Helth {
     constructor(param, caps, helthParam) {
         const person = new Image();
-        person.src = param.roadToPicture;
+        person.src = param.roadToPicture[param.currentIndexPicture];
         super(Object.assign(Object.assign({}, param), { person }), Object.assign({}, helthParam));
         this.muveUp = (event) => {
             switch (event.key) {
@@ -40,6 +40,7 @@ export class User extends Helth {
         this.verticalVelocity = param.verticalVelocity;
         this.bodyWeight = param.bodyWeight;
         this.roadToPicture = param.roadToPicture;
+        this.currentIndexPicture = param.currentIndexPicture;
     }
 }
 ;

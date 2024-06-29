@@ -7,17 +7,25 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
     const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
     let ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     let userTabs: MoveTabs = new MoveTabs('w','s','d','a');
-
-    const user: User = new User({roadToPicture:"images/tile-P.png",x:10,
+    
+    let userSrc: string[]=[];
+    for (let i=0;i<6;i++){
+        userSrc.push("images/player/tile-P-"+(i+1)+".png");
+    }
+    const user: User = new User({roadToPicture:userSrc,x:10,
         y:150,verticalForce:50, horizontalForce:50, horizontalBoost:0,
         verticalBoost:0,horizontalVelocity:0,verticalVelocity:0,
-        bodyWeight:2},userTabs,{helth:100,isDead:false,maxHelth:100,minHelth:0});
+        bodyWeight:2,currentIndexPicture:0,speedPictureChange:2},userTabs,{helth:100,isDead:false,
+            maxHelth:100,minHelth:0});
     const userKinematic = new Kinematics(user,0.3,0.3)
-
-    const enemyOne:Enemy=new Enemy({roadToPicture:"images/tile-E.png",x:0,
+    let enemyScr: string[]=[];
+    for (let i=0;i<4;i++){
+        enemyScr.push("images/firstEnemy/tile-E-"+(i+1)+".png");
+    }
+    const enemyOne:Enemy=new Enemy({roadToPicture:enemyScr,x:0,
         y:200,verticalForce:0, horizontalForce:0, horizontalBoost:0,
         verticalBoost:0,horizontalVelocity:10,verticalVelocity:0,
-        bodyWeight:2},{helth:100,isDead:false,maxHelth:100,minHelth:0});
+        bodyWeight:2,currentIndexPicture:0,speedPictureChange:5},{helth:100,isDead:false,maxHelth:100,minHelth:0});
     const enemyKinematic = new Kinematics(enemyOne,0.3,0.3)
 
     const bg = new Image();
@@ -37,7 +45,8 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
         ctx.drawImage(pipeBottom, 200, 400);
 
         enemyKinematic.update(enemyOne);
-        enemyKinematic.calcNewCoord((x0,x1,y0,y1)=>{
+        enemyKinematic.calcNewCoord(enemyOne.person.width,enemyOne.person.height,
+            (x0,x1,y0,y1,w,h)=>{
             if (y1+enemyOne.person.height<=canvas.height && y1>=0){
                 if  (x1+enemyOne.person.width<=canvas.width && x1>=0){
                     return [x1,y1]
@@ -60,7 +69,8 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
 
         
         userKinematic.update(user)
-        userKinematic.calcNewCoord((x0,x1,y0,y1)=>{
+        userKinematic.calcNewCoord(user.person.width,user.person.height,
+            (x0,x1,y0,y1,w,h)=>{
             if (y1+user.person.height<=canvas.height && y1>=0){
                 if  (x1+user.person.width<=canvas.width && x1>=0){
                     return [x1,y1]

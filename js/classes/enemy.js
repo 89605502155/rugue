@@ -2,9 +2,10 @@ import { Helth } from './helth.js';
 export class Enemy extends Helth {
     constructor(param, helthParam) {
         const person = new Image();
-        person.src = param.roadToPicture;
+        person.src = param.roadToPicture[param.currentIndexPicture];
         super(Object.assign(Object.assign({}, param), { person }), Object.assign({}, helthParam));
         this.person = person;
+        this.currentIndexPicture = param.currentIndexPicture;
         this.roadToPicture = param.roadToPicture;
         this.x = param.x;
         this.y = param.y;

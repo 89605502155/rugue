@@ -19,10 +19,10 @@ export class Kinematics {
         this.resistanceX = resistanceX;
         this.resistanceY = resistanceY;
     }
-    calcNewCoord(controlFunc) {
+    calcNewCoord(width, height, controlFunc) {
         let potentialX = __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_calcDeltaRoadX).call(this);
         let potentialY = __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_calcDeltaRoadY).call(this);
-        let newCoord = controlFunc(this.x, this.x + potentialX, this.y, this.y + potentialY);
+        let newCoord = controlFunc(this.x, this.x + potentialX, this.y, this.y + potentialY, width, height);
         this.x = newCoord[0];
         this.y = newCoord[1];
         __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_forceToZero).call(this);

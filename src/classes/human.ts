@@ -3,21 +3,44 @@ import { HumanDraw, KinematicInterface } from "./user.js";
 
 export class DrawMovingObject {
     horizontalVelocity: number;
+    verticalVelocity: number;
     x: number;
     y: number;
     person: HTMLImageElement;
+    roadToPicture:string[];
+    currentIndexPicture: number;
+    speedPictureChange:number;
+    speedMarker:number;
     constructor(param: HumanDraw){
         this.horizontalVelocity = param.horizontalVelocity;
+        this.verticalVelocity= param.verticalVelocity;
         this.x = param.x;
         this.y = param.y;
         this.person = param.person;
+        this.roadToPicture= param.roadToPicture;
+        this.currentIndexPicture=param.currentIndexPicture;
+        this.speedPictureChange=5;
+        this.speedMarker=5;
     }
     draw(ctx: CanvasRenderingContext2D) {
         ctx.save();
+        if (Math.abs(this.horizontalVelocity)>=1 || Math.abs(this.verticalVelocity)>=1){
+            if (this.speedMarker!==0){
+                this.speedMarker--;
+            } else {
+                this.currentIndexPicture=(this.currentIndexPicture+1)%this.roadToPicture.length;
+                this.person.src=this.roadToPicture[this.currentIndexPicture];
+                this.speedMarker=this.speedPictureChange;
+            }
+        }else {
+            if (this.currentIndexPicture!==0){
+                this.currentIndexPicture=0;
+                this.person.src=this.roadToPicture[this.currentIndexPicture];
+            }
+        }
         if (this.horizontalVelocity<0) {
             ctx.scale(-1, 1);
             ctx.drawImage(this.person, -this.x - this.person.width, this.y);
-            // ctx.drawImage(this.person, this.x- this.person.width, this.y);
         } else {
             ctx.drawImage(this.person, this.x, this.y);
         }
@@ -25,7 +48,7 @@ export class DrawMovingObject {
     }
 }
 export class MobileObject extends DrawMovingObject {
-    roadToPicture:string;
+    roadToPicture:string[];
     x: number;
     y: number;
     verticalForce: number;
@@ -92,7 +115,7 @@ export class GetPointsObject{
     getPoints(){
 
     }
-    #
+    
 
 }
 

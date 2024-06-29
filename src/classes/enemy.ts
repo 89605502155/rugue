@@ -1,7 +1,7 @@
 import { Helth, HelthInput } from './helth.js';
 
 export interface MovingObjectDrawInput{
-    roadToPicture:string;
+    roadToPicture:string[];
     x: number;
     y: number;
     verticalForce: number;
@@ -12,9 +12,11 @@ export interface MovingObjectDrawInput{
     verticalVelocity: number;
     person: HTMLImageElement;
     bodyWeight: number;
+    currentIndexPicture: number;
+    speedPictureChange: number;
 }
 export interface MovingObjectInput{
-    roadToPicture:string;
+    roadToPicture:string[];
     x: number;
     y: number;
     verticalForce: number;
@@ -24,9 +26,11 @@ export interface MovingObjectInput{
     horizontalVelocity: number;
     verticalVelocity: number;
     bodyWeight: number;
+    currentIndexPicture:number;
+    speedPictureChange: number;
 }
 export class Enemy extends Helth {
-    roadToPicture:string;
+    roadToPicture:string[];
     x: number;
     y: number;
     verticalForce: number;
@@ -39,11 +43,13 @@ export class Enemy extends Helth {
     bodyWeight: number;
     constHorizontalVelocity: number;
     constVerticalVelocity: number;
+    currentIndexPicture:number;
     constructor(param: MovingObjectInput,helthParam: HelthInput){
         const person = new Image();
-        person.src = param.roadToPicture;
-        super({...param,person},{ ...helthParam });
+        person.src = param.roadToPicture[param.currentIndexPicture];
+        super({ ...param, person }, { ...helthParam });
         this.person=person;
+        this.currentIndexPicture=param.currentIndexPicture;
         this.roadToPicture=param.roadToPicture;
         this.x=param.x;
         this.y=param.y;

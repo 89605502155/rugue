@@ -28,7 +28,7 @@ export interface KinematicInterface{
 
 
 export class User extends Helth {
-    roadToPicture:string;
+    roadToPicture:string[];
     x: number;
     y: number;
     caps: MoveTabs;
@@ -40,9 +40,10 @@ export class User extends Helth {
     verticalVelocity: number;
     person: HTMLImageElement;
     bodyWeight: number;
+    currentIndexPicture: number;
     constructor(param: MovingObjectInput,caps:MoveTabs,helthParam: HelthInput){
         const person = new Image();
-        person.src = param.roadToPicture;
+        person.src = param.roadToPicture[param.currentIndexPicture];
         super({...param,person},{...helthParam});
         this.caps=caps;
         this.x=param.x;
@@ -55,7 +56,8 @@ export class User extends Helth {
         this.horizontalVelocity=param.horizontalVelocity;
         this.verticalVelocity=param.verticalVelocity;
         this.bodyWeight=param.bodyWeight;
-        this.roadToPicture=param.roadToPicture;    
+        this.roadToPicture=param.roadToPicture; 
+        this.currentIndexPicture=param.currentIndexPicture;
     }
     muveUp = (event: KeyboardEvent) =>{
         switch(event.key){
@@ -78,8 +80,12 @@ export class User extends Helth {
 
 export interface HumanDraw{
     horizontalVelocity: number;
+    verticalVelocity: number;
     x: number;
     y: number;
     person: HTMLImageElement;
+    roadToPicture:string[];
+    currentIndexPicture: number;
+    speedPictureChange: number;
 };
 
