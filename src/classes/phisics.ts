@@ -82,8 +82,6 @@ export class Kinematics{
         let potentialX=this.#calcDeltaRoadX();
         let potentialY=this.#calcDeltaRoadY();
         let newCoord:[number,number]=controlFunc(this.x,this.x+potentialX,this.y,this.y+potentialY);
-        // this.horizontalVelocity=newCoord[0]-this.x;
-        // this.verticalVelocity=newCoord[1]-this.y;
         this.x=newCoord[0];
         this.y=newCoord[1];
         this.#forceToZero();
@@ -113,3 +111,4 @@ export class Kinematics{
         this.verticalVelocity=params.verticalVelocity;
     }
 }
+

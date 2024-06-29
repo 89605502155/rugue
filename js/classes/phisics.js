@@ -50,8 +50,6 @@ export class Kinematics {
         let potentialX = __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_calcDeltaRoadX).call(this);
         let potentialY = __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_calcDeltaRoadY).call(this);
         let newCoord = controlFunc(this.x, this.x + potentialX, this.y, this.y + potentialY);
-        // this.horizontalVelocity=newCoord[0]-this.x;
-        // this.verticalVelocity=newCoord[1]-this.y;
         this.x = newCoord[0];
         this.y = newCoord[1];
         __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_forceToZero).call(this);

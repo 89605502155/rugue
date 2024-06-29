@@ -1,3 +1,6 @@
+import { HumanInput } from "./enemy.js";
+import { Human } from "./human.js";
+
 export class MoveTabs{
     Up: string;
     Down: string;
@@ -24,7 +27,7 @@ export interface KinematicInterface{
 }
 
 
-export class User {
+export class User extends Human {
     roadToPicture:string;
     x: number;
     y: number;
@@ -37,63 +40,46 @@ export class User {
     verticalVelocity: number;
     person: HTMLImageElement;
     bodyWeight: number;
-    constructor(roadToPicture:string, x: number, y: number, 
-        caps:MoveTabs,verticalForce:number, horizontalForce:number,horizontalBoost:number,
-    verticalBoost:number,horizontalVelocity:number,verticalVelocity:number, bodyWeight:number){
-        this.person = new Image();
-        this.person.src=roadToPicture;
-        this.roadToPicture=roadToPicture;
-        this.x=x;
-        this.y=y;
+    constructor(param: HumanInput,caps:MoveTabs){
+        const person = new Image();
+        person.src = param.roadToPicture;
+        super({...param,person});
         this.caps=caps;
-        this.verticalForce=verticalForce;
-        this.horizontalForce=horizontalForce;
-        this.horizontalBoost=horizontalBoost;
-        this.verticalBoost=verticalBoost;
-        this.horizontalVelocity=horizontalVelocity;
-        this.verticalVelocity=verticalVelocity;
-        this.bodyWeight=bodyWeight;
+        this.x=param.x;
+        this.y=param.y;
+        this.person=person;
+        this.verticalForce=param.verticalForce;
+        this.horizontalForce=param.horizontalForce;
+        this.horizontalBoost=param.horizontalBoost;
+        this.verticalBoost=param.verticalBoost;
+        this.horizontalVelocity=param.horizontalVelocity;
+        this.verticalVelocity=param.verticalVelocity;
+        this.bodyWeight=param.bodyWeight;
+        this.roadToPicture=param.roadToPicture;    
     }
     muveUp = (event: KeyboardEvent) =>{
         switch(event.key){
             case this.caps.Up:
-                this.verticalForce=-50;
+                this.verticalForce=-75;
                 break;
             case this.caps.Down:
-                this.verticalForce=+50;
+                this.verticalForce=+75;
                 break;
             case this.caps.Left:
-                this.horizontalForce=-50;
+                this.horizontalForce=-75;
                 break;
             case this.caps.Right:
-                this.horizontalForce=50;
+                this.horizontalForce=75;
                 break;
         }
     };
-    updateKinematic(coord:KinematicInterface){
-        this.x=coord.x;
-        this.y=coord.y;
-        this.verticalForce=coord.verticalForce;
-        this.horizontalForce=coord.horizontalForce;
-        this.horizontalBoost=coord.horizontalBoost;
-        this.verticalBoost=coord.verticalBoost;
-        this.horizontalVelocity=coord.horizontalVelocity;
-        this.verticalVelocity=coord.verticalVelocity;
-        this.bodyWeight=coord.bodyWeight;
-    }
-    getKinematicsParams():KinematicInterface{
-        return {
-            x:this.x,
-            y:this.y,
-            verticalForce:this.verticalForce,
-            horizontalForce:this.horizontalForce,
-            horizontalBoost:this.horizontalBoost,
-            verticalBoost:this.verticalBoost,
-            horizontalVelocity:this.horizontalVelocity,
-            verticalVelocity:this.verticalVelocity,
-            bodyWeight:this.bodyWeight
-        }
-    }
     
-    
-}
+};
+
+export interface HumanDraw{
+    horizontalVelocity: number;
+    x: number;
+    y: number;
+    person: HTMLImageElement;
+};
+
