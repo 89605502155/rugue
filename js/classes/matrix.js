@@ -9,16 +9,15 @@ export var Material;
     Material[Material["Air"] = 0] = "Air";
     Material[Material["StaticStone"] = 1] = "StaticStone";
     Material[Material["ElasticStone"] = 2] = "ElasticStone";
-    Material[Material["DinamicicStone"] = 3] = "DinamicicStone";
-    Material[Material["Medecine"] = 4] = "Medecine";
-    Material[Material["Dangerous"] = 5] = "Dangerous";
-    Material[Material["Enemy"] = 6] = "Enemy";
-    Material[Material["Player"] = 7] = "Player";
+    Material[Material["Medecine"] = 3] = "Medecine";
+    Material[Material["Dangerous"] = 4] = "Dangerous";
+    Material[Material["Enemy"] = 5] = "Enemy";
+    Material[Material["Player"] = 6] = "Player";
 })(Material || (Material = {}));
 export class MaterialElastic {
-    constructor(elasticStone, dinamikStone) {
-        this.elasticStone = elasticStone;
-        this.dinamikStone = dinamikStone;
+    constructor(elasticA, elasticV) {
+        this.elasticA = elasticA;
+        this.elasticV = elasticV;
     }
 }
 export class Block {
@@ -31,8 +30,74 @@ export class Block {
     }
 }
 export class MapField {
-    constructor(width, height, widthStep, heightStep, elasticStone, dinamikStone) {
+    constructor(width, height, widthStep, heightStep, elasticA, elasticV) {
         _MapField_instances.add(this);
+        this.calculateCollision = (atThisMoment, x1, y1, width, height) => {
+            let startPoint = this.convertFromPixel(atThisMoment.x, atThisMoment.y);
+            let potentialPoint = this.convertFromPixel(x1, y1);
+            let objectsOnRoad = new NotBaseObjecs();
+            if (startPoint[0] !== potentialPoint[0] && startPoint[1] !== potentialPoint[1]) {
+                let verticalLow = startPoint[1] <= potentialPoint[1];
+                let horizontalLow = startPoint[0] <= potentialPoint[0];
+                let equ = (startPoint[1] - potentialPoint[1]) / (startPoint[0] - potentialPoint[0]);
+                let lessStepDeviation;
+                let biggerStepDeviation;
+                if (equ >= 1) {
+                    lessStepDeviation = 1;
+                    biggerStepDeviation = Math.ceil(equ);
+                }
+                else {
+                    equ = 1 / equ;
+                    lessStepDeviation = Math.ceil(equ);
+                    biggerStepDeviation = 1;
+                }
+                if (horizontalLow && !verticalLow) {
+                    let to = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y + height);
+                    let toFin = this.convertFromPixel(x1 + width, y1 + height);
+                    let m0 = toFin[0] - to[0];
+                    let m1 = toFin[1] - to[1];
+                    let num = Math.min(m0, m1);
+                    for (let i = 0; i < num + 1; i++) {
+                        objectsOnRoad = __classPrivateFieldGet(this, _MapField_instances, "m", _MapField_setFrontAngular).call(this, { startX: startPoint[0], startY: startPoint[1],
+                            step: biggerStepDeviation }, { startX: to[0], startY: to[1], step: lessStepDeviation }, verticalLow, horizontalLow, objectsOnRoad);
+                        if (objectsOnRoad.staticStone !== 0 || objectsOnRoad.enemy !== 0) {
+                            atThisMoment.verticalVelocity = 0;
+                            atThisMoment.horizontalVelocity = 0;
+                            return atThisMoment;
+                        }
+                        if (objectsOnRoad.elasticStone !== 0) {
+                            atThisMoment.verticalVelocity -= (objectsOnRoad.elasticStone * this.elasticMat.elasticV);
+                            atThisMoment.horizontalVelocity -= (objectsOnRoad.elasticStone * this.elasticMat.elasticV);
+                            if (atThisMoment.verticalVelocity <= 0) {
+                                atThisMoment.verticalForce = (-1) * (objectsOnRoad.elasticStone * this.elasticMat.elasticA);
+                            }
+                            if (atThisMoment.horizontalVelocity <= 0) {
+                                atThisMoment.horizontalForce = (-1) * (objectsOnRoad.elasticStone * this.elasticMat.elasticA);
+                            }
+                            if (atThisMoment.verticalVelocity <= 0 || atThisMoment.horizontalVelocity <= 0) {
+                                return atThisMoment;
+                            }
+                        }
+                        startPoint[1] += biggerStepDeviation;
+                        to[1] += biggerStepDeviation;
+                        startPoint[0] += lessStepDeviation;
+                        to[0] += lessStepDeviation;
+                        let renewCoord = this.convertToPixel(...startPoint);
+                        atThisMoment.x = renewCoord[0];
+                        atThisMoment.y = renewCoord[1];
+                    }
+                    return atThisMoment;
+                }
+                else {
+                    atThisMoment.x = x1;
+                    atThisMoment.y = y1;
+                    return atThisMoment;
+                }
+            }
+            atThisMoment.x = x1;
+            atThisMoment.y = y1;
+            return atThisMoment;
+        };
         this.width = width;
         this.height = height;
         this.widthStep = widthStep;
@@ -50,7 +115,7 @@ export class MapField {
             Material.Air
         ];
         this.stopSlice = [Material.StaticStone, Material.Dangerous, Material.Enemy];
-        this.elasticMat = new MaterialElastic(elasticStone, dinamikStone);
+        this.elasticMat = new MaterialElastic(elasticA, elasticV);
     }
     ;
     convertFromPixel(x, y) {
@@ -91,43 +156,6 @@ export class MapField {
         ;
         return resoult;
     }
-    calculateCollision(atThisMoment, x1, y1, width, height) {
-        let startPoint = this.convertFromPixel(atThisMoment.x, atThisMoment.y);
-        let potentialPoint = this.convertFromPixel(x1, y1);
-        if (startPoint[0] !== potentialPoint[0] && startPoint[1] !== potentialPoint[1]) {
-            let verticalLow = startPoint[1] <= potentialPoint[1];
-            let horizontalLow = startPoint[0] <= potentialPoint[0];
-            let equ = (startPoint[1] - potentialPoint[1]) / (startPoint[0] - potentialPoint[0]);
-            let lessStepDeviation;
-            let biggerStepDeviation;
-            if (equ >= 1) {
-                lessStepDeviation = 1;
-                biggerStepDeviation = Math.ceil(equ);
-            }
-            else {
-                equ = 1 / equ;
-                lessStepDeviation = Math.ceil(equ);
-                biggerStepDeviation = 1;
-            }
-            if (horizontalLow && verticalLow) {
-                let to = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y + height);
-                let toFin = this.convertFromPixel(x1 + width, y1 + height);
-                __classPrivateFieldGet(this, _MapField_instances, "m", _MapField_setFrontAngular).call(this, { startX: startPoint[0], startY: startPoint[1], step: biggerStepDeviation }, { startX: to[0], startY: to[1], step: lessStepDeviation }, verticalLow, horizontalLow);
-            }
-            else if (horizontalLow && !verticalLow) {
-                let st = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y);
-                let fin = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y);
-                // this.#setFrontAngular(startPoint[0],startPoint[1],potentialPoint[0],potentialPoint[1],
-                //     lessStepDeviation,biggerStepDeviation,verticalLow,horizontalLow);
-            }
-            else if (!horizontalLow && verticalLow) {
-                return 'a is false and b is true';
-            }
-            else {
-                return 'Both a and b are false';
-            }
-        }
-    }
 }
 _MapField_instances = new WeakSet(), _MapField_studyAreaForHumanOnBuild = function _MapField_studyAreaForHumanOnBuild(RightUp, LeftUp, RightDown, LeftDown) {
     for (let i = LeftDown[1]; i < RightUp[1]; i++) {
@@ -138,18 +166,40 @@ _MapField_instances = new WeakSet(), _MapField_studyAreaForHumanOnBuild = functi
         }
     }
     return true;
-}, _MapField_setFrontAngular = function _MapField_setFrontAngular(firstTrack, secondTrack, verticalLow, horizontalLow) {
-    if (horizontalLow && verticalLow) {
-        // return this.mapFiels[]
-        return 'Both a and b are true';
+}, _MapField_setFrontAngular = function _MapField_setFrontAngular(firstTrack, secondTrack, verticalLow, horizontalLow, list) {
+    if (horizontalLow && !verticalLow) {
+        for (let i = firstTrack.startX; i <= secondTrack.startX + secondTrack.step; i++) {
+            for (let j = firstTrack.startY - firstTrack.step; j <= secondTrack.startY; j++) {
+                if (i < secondTrack.startX && j < firstTrack.startY) {
+                    continue;
+                }
+                if (this.mapFiels[i][j] !== Material.Air) {
+                    list.append(this.mapFiels[i][j]);
+                }
+            }
+        }
     }
-    else if (horizontalLow && !verticalLow) {
-        return 'a is true and b is false';
-    }
-    else if (!horizontalLow && verticalLow) {
-        return 'a is false and b is true';
-    }
-    else {
-        return 'Both a and b are false';
-    }
+    return list;
 };
+export class NotBaseObjecs {
+    constructor() {
+        this.staticStone = 0;
+        this.enemy = 0;
+        this.dangerous = 0;
+        this.elasticStone = 0;
+    }
+    append(ob) {
+        if (ob === Material.StaticStone) {
+            this.staticStone++;
+        }
+        else if (ob === Material.Enemy) {
+            this.enemy++;
+        }
+        else if (ob === Material.Dangerous) {
+            this.dangerous++;
+        }
+        else if (ob === Material.ElasticStone) {
+            this.elasticStone++;
+        }
+    }
+}

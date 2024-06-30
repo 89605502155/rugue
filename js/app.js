@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', (_event) => {
     const canvas = document.getElementById('myCanvas');
     let ctx = canvas.getContext("2d");
     let mapField = new MapField(canvas.width, canvas.height, 50, 30, 100, 100);
-    let stone = new Block(Material.StaticStone, 10, 50, 100, 150);
+    let stone = new Block(Material.StaticStone, 500, 150, 100, 150);
     let isPaintStone = mapField.appendObjectBuild(stone);
     // console.log(mapField.mapFiels);
     let player = generatePlayer();
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', (_event) => {
     const enemyKinematic = enemy[1];
     // 30 * 12
     const bg = new Image();
-    const fg = new Image(50, 150);
+    const fg = new Image();
     // const pipeBottom = new Image();
     bg.src = "images/tile-.png";
     fg.src = "images/tile-W.png";
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', (_event) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBg(bg, ctx, canvas);
         // ctx.drawImage(bg, 0,0,canvas.width, canvas.height);
-        drawStaticStone(fg, ctx, canvas, 50, 150, 10, 50);
+        drawStaticStone(fg, ctx, canvas, 100, 150, 500, 150);
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord(enemyOne.person.width, enemyOne.person.height, (k, x1, y1, w, h) => {
             if (y1 + enemyOne.person.height <= canvas.height && y1 >= 0) {
@@ -57,28 +57,7 @@ document.addEventListener('DOMContentLoaded', (_event) => {
         enemyOne.calcVelocity();
         enemyOne.draw(ctx);
         userKinematic.update(user);
-        userKinematic.calcNewCoord(user.person.width, user.person.height, (k, x1, y1, w, h) => {
-            if (y1 + user.person.height <= canvas.height && y1 >= 0) {
-                if (x1 + user.person.width <= canvas.width && x1 >= 0) {
-                    k.x = x1;
-                    k.y = y1;
-                    return k;
-                }
-                else {
-                    k.y = y1;
-                    return k;
-                }
-            }
-            else {
-                if (x1 + user.person.width <= canvas.width && x1 >= 0) {
-                    k.x = x1;
-                    return k;
-                }
-                else {
-                    return k;
-                }
-            }
-        });
+        userKinematic.calcNewCoord(user.person.width, user.person.height, mapField.calculateCollision);
         user.updateKinematic(userKinematic);
         user.draw(ctx);
         requestAnimationFrame(draw);
@@ -96,7 +75,7 @@ function generatePlayer() {
         verticalBoost: 0, horizontalVelocity: 0, verticalVelocity: 0,
         bodyWeight: 2, currentIndexPicture: 0, speedPictureChange: 2 }, userTabs, { helth: 100, isDead: false,
         maxHelth: 100, minHelth: 0 });
-    const userKinematic = new Kinematics(user, 0.03, 0.03);
+    const userKinematic = new Kinematics(user, 0.3, 0.3);
     return [user, userKinematic];
 }
 function generateEnemy() {

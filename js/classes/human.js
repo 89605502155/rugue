@@ -85,17 +85,3 @@ export class MobileObject extends DrawMovingObject {
     }
 }
 ;
-export var ColliderShapes;
-(function (ColliderShapes) {
-    ColliderShapes[ColliderShapes["Circle"] = 0] = "Circle";
-    ColliderShapes[ColliderShapes["Rectangle"] = 1] = "Rectangle";
-    ColliderShapes[ColliderShapes["Triangle"] = 2] = "Triangle";
-    ColliderShapes[ColliderShapes["Elipse"] = 3] = "Elipse";
-})(ColliderShapes || (ColliderShapes = {}));
-export class GetPointsObject {
-    constructor(param) {
-        this.typeShape = param;
-    }
-    getPoints() {
-    }
-}

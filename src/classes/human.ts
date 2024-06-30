@@ -101,21 +101,4 @@ export class MobileObject extends DrawMovingObject {
         return [this.x,this.y,this.person.width,this.person.height];
     }
 };
-export enum ColliderShapes{
-    Circle,
-    Rectangle,
-    Triangle,
-    Elipse,
-}
-export class GetPointsObject{
-    typeShape: ColliderShapes;
-    constructor(param: ColliderShapes){
-        this.typeShape= param;
-    }
-    getPoints(){
-
-    }
-    
-
-}
 
