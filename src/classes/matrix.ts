@@ -46,18 +46,20 @@ export class MapField {
                 this.mapFiels[i][j]=Material.Air;
             }
         }
-        this.secondSlice=[Material.Medecine,Material.Dangerous,Material.Enemy,Material.Player];
+        this.secondSlice=[Material.Medecine,Material.Dangerous,Material.Enemy,Material.Player,
+            Material.Air
+        ];
     }
     #studyAreaForHumanOnBuild(RightUp:[number,number],LeftUp:[number,number],RightDown:[number,number],
         LeftDown:[number,number]):boolean{
-            for (let i=RightUp[1];i<LeftDown[1];i++){
-                for (let j=LeftUp[0];j<RightDown[0];j++){
-                    if (this.mapFiels[i][j]!==Material.Air){
-                        return false;
-                    }
+        for (let i=LeftDown[1];i<RightUp[1];i++){
+            for (let j=LeftUp[0];j<RightDown[0];j++){
+                if (this.mapFiels[i][j]!==Material.Air){
+                    return false;
                 }
             }
-            return true;
+        }
+        return true;
     };
     convertFromPixel(x:number,y:number):[number,number,number,number,number,number]{
         let xCoord=Math.floor(x/this.widthStep);
@@ -69,11 +71,6 @@ export class MapField {
     shortConvertFromPixel(x:number,y:number):[number,number]{
         let xCoord=Math.floor(x/this.widthStep);
         let yCoord=Math.floor(y/this.heightStep);
-        console.log(x,y)
-        console.log(this.widthStep,this.heightStep)
-        console.log(xCoord,yCoord)
-        console.log(x%this.widthStep,y%this.heightStep)
-        console.log()
         return [xCoord,yCoord];
     };
     convertToPixel(xCoord:number,yCoord:number,xDev:number,yDev:number,
@@ -98,13 +95,9 @@ export class MapField {
                 this.mapFiels[i].fill(object_.material,LeftUp[0],RightDown[0]+1)
             }
         };
-        console.log();
-        console.log();
-        console.log(RightUp[1],LeftDown[1],"y",LeftUp[0],RightDown[0],"x");
-        console.log(object_.yCoord,object_.yCoord+object_.ySize,"y",
-            object_.xCoord,object_.xCoord+object_.xSize,"x");
-        console.log(...this.convertToPixel(...LeftUp,10,20,this.widthStep,this.heightStep),
-        "y",...this.convertToPixel(...RightDown,10,20,this.widthStep,this.heightStep),"x");
         return resoult;
+    }
+    calculateCollision(x0:number,x1:number,y0:number,y1:number,w:number,h:number){
+        
     }
 }

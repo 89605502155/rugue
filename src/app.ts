@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
     let mapField:MapField= new MapField(canvas.width,canvas.height,50,30);
     let stone:Block= new Block(Material.StaticStone,10,50,100,150);
     let isPaintStone:boolean= mapField.appendObjectBuild(stone)
-    console.log(isPaintStone);
+
+    // console.log(mapField.mapFiels);
     let player = generatePlayer();
     const user=player[0];
     const userKinematic=player[1];
@@ -21,21 +22,22 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
     const enemyKinematic=enemy[1];
     // 30 * 12
 
-    // const bg = new Image();
+    const bg = new Image();
     const fg = new Image( 50,  150);
     // const pipeBottom = new Image();
 
-    // bg.src = "images/tile-.png";
+    bg.src = "images/tile-.png";
     fg.src = "images/tile-W.png";
     // pipeBottom.src = "images/tile-SW.png";
 
     document.addEventListener("keydown",user.muveUp)
     
+    
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // ctx.drawImage(bg, 0, 0);
-        ctx.drawImage(fg,10,50, 50,  150);
-        // ctx.drawImage(pipeBottom, 200, 400);
+        drawBg(bg,ctx,canvas);
+        // ctx.drawImage(bg, 0,0,canvas.width, canvas.height);
+        drawStaticStone(fg,ctx,canvas,50,150,10,50)
 
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord(enemyOne.person.width,enemyOne.person.height,
@@ -111,4 +113,21 @@ function generateEnemy():[Enemy,Kinematics]  {
         bodyWeight:2,currentIndexPicture:0,speedPictureChange:5},{helth:100,isDead:false,maxHelth:100,minHelth:0});
     const enemyKinematic = new Kinematics(enemyOne,0.3,0.3)
     return [enemyOne,enemyKinematic];
+}
+
+function drawBg(bg: HTMLImageElement,ctx: CanvasRenderingContext2D,canvas: HTMLCanvasElement){
+    const pattern = ctx.createPattern(bg, 'repeat') as CanvasPattern;
+    ctx.fillStyle = pattern;
+    const areaWidth = canvas.width;
+    const areaHeight = canvas.height;
+    ctx.fillRect(0, 0, areaWidth, areaHeight);
+}
+function drawStaticStone(obj: HTMLImageElement,ctx: CanvasRenderingContext2D,canvas: HTMLCanvasElement,
+    width:number,height:number,x0:number,y0:number
+){
+    const pattern = ctx.createPattern(obj, 'repeat') as CanvasPattern;
+    ctx.fillStyle = pattern;
+    const areaWidth = width;
+    const areaHeight = height;
+    ctx.fillRect(x0, y0, areaWidth, areaHeight);
 }
