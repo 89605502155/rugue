@@ -125,6 +125,39 @@ export class MapField {
                     }
                 }
             }
+        } else if (!horizontalLow && verticalLow){
+            for (let i=secondTrack.startX;i>=firstTrack.startX-firstTrack.step;i--){
+                for (let j=firstTrack.startY;j<=secondTrack.startY+secondTrack.step;j++){
+                    if (i>firstTrack.startX && j>secondTrack.startY){
+                        continue;
+                    }
+                    if (this.mapFiels[i][j]!==Material.Air) {
+                        list.append(this.mapFiels[i][j]);
+                    }
+                }
+            }
+        } else if (horizontalLow && verticalLow){
+            for (let i=secondTrack.startX;i<=firstTrack.startX+firstTrack.step;i++){
+                for (let j=firstTrack.startY;j<=secondTrack.startY+secondTrack.step;j++){
+                    if (i<firstTrack.startX && j<secondTrack.startY){
+                        continue;
+                    }
+                    if (this.mapFiels[i][j]!==Material.Air) {
+                        list.append(this.mapFiels[i][j]);
+                    }
+                }
+            }
+        } else {
+            for (let i=firstTrack.startX;i>=secondTrack.startX-secondTrack.step;i--){
+                for (let j=secondTrack.startY;j<=firstTrack.startY-firstTrack.step;j--){
+                    if (i>secondTrack.startX && j<firstTrack.startY){
+                        continue;
+                    }
+                    if (this.mapFiels[i][j]!==Material.Air) {
+                        list.append(this.mapFiels[i][j]);
+                    }
+                }
+            }
         }
         return list;
     }
@@ -150,12 +183,12 @@ export class MapField {
                 lessStepDeviation=Math.ceil(equ);
                 biggerStepDeviation=1;
             }
-            if (horizontalLow && !verticalLow) {
-                let to = this.convertFromPixel(atThisMoment.x+width,atThisMoment.y+height)
-                let toFin = this.convertFromPixel(x1+width,y1+height)
+            if ((horizontalLow && !verticalLow)||(!horizontalLow && verticalLow)) {
+                let to = this.convertFromPixel(atThisMoment.x+width,atThisMoment.y+height);
+                let toFin = this.convertFromPixel(x1+width,y1+height);
                 let m0:number=toFin[0]-to[0];
                 let m1:number=toFin[1]-to[1];
-                let num:number=Math.min(m0,m1);
+                let num:number=Math.min(Math.abs(m0),Math.abs(m1));
                 for (let i=0;i<num+1;i++){
                     objectsOnRoad=this.#setFrontAngular({startX: startPoint[0],startY: startPoint[1],
                          step:biggerStepDeviation},{startX:to[0],startY:to[1],step:lessStepDeviation},
@@ -181,8 +214,13 @@ export class MapField {
                     }
                     startPoint[1]+=biggerStepDeviation;
                     to[1]+=biggerStepDeviation;
-                    startPoint[0]+=lessStepDeviation;
-                    to[0]+=lessStepDeviation;
+                    if (!horizontalLow && verticalLow){
+                        startPoint[0]-=lessStepDeviation;
+                        to[0]-=lessStepDeviation;
+                    } else {
+                        startPoint[0]+=lessStepDeviation;
+                        to[0]+=lessStepDeviation;
+                    }
                     let renewCoord: [number, number]=this.convertToPixel(...startPoint);
                     atThisMoment.x=renewCoord[0];
                     atThisMoment.y=renewCoord[1];
@@ -190,7 +228,7 @@ export class MapField {
                 }
                 return atThisMoment;
                 
-            } else {
+            } else if (horizontalLow && verticalLow){
                 atThisMoment.x=x1;
                 atThisMoment.y=y1;
                 return atThisMoment;
