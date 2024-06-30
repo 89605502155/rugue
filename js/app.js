@@ -2,14 +2,13 @@ import { Enemy } from "./classes/enemy.js";
 import { Block, MapField, Material } from "./classes/matrix.js";
 import { Kinematics } from "./classes/phisics.js";
 import { MoveTabs, User } from "./classes/user.js";
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', (_event) => {
     const canvas = document.getElementById('myCanvas');
     let ctx = canvas.getContext("2d");
-    let mapField = new MapField(canvas.width, canvas.height, 50, 30);
+    let mapField = new MapField(canvas.width, canvas.height, 50, 30, 100, 100);
     let stone = new Block(Material.StaticStone, 10, 50, 100, 150);
     let isPaintStone = mapField.appendObjectBuild(stone);
-    mapField.secondSlice.push(Material.Air);
-    console.log(mapField.mapFiels);
+    // console.log(mapField.mapFiels);
     let player = generatePlayer();
     const user = player[0];
     const userKinematic = player[1];
@@ -29,49 +28,28 @@ document.addEventListener('DOMContentLoaded', (event) => {
         drawBg(bg, ctx, canvas);
         // ctx.drawImage(bg, 0,0,canvas.width, canvas.height);
         drawStaticStone(fg, ctx, canvas, 50, 150, 10, 50);
-        drawStaticStone(fg, ctx, canvas, 50, 150, 150, 350);
-        drawStaticStone(fg, ctx, canvas, 50, 150, 410, 50);
-        drawStaticStone(fg, ctx, canvas, 50, 150, 710, 450);
-        drawStaticStone(fg, ctx, canvas, 50, 150, 910, 50);
-        // mapField.mapFiels.forEach((row,rowIndex)=>{
-        //     row.forEach((material, colIndex) => {
-        //         if (mapField.secondSlice.indexOf(material)===-1) {
-        //             // drawTile(colIndex, rowIndex);
-        //             drawStaticStone(bg,ctx,canvas,50,30,colIndex*50,rowIndex*30)
-        //         } else {
-        //             drawStaticStone(bg,ctx,canvas,50,30,colIndex*50,rowIndex*30)
-        //         }
-        //     })
-        // })
-        // for (let i=0; i<mapField.mapFiels.length;i++){
-        //     for (let j=0;j<mapField.mapFiels[i].length;j++){
-        //         if (mapField.secondSlice.indexOf(mapField.mapFiels[i][j])!==-1){
-        //             drawStaticStone(bg,ctx,canvas,50,30,i*50,j*30)
-        //         } else {
-        //             drawStaticStone(fg,ctx,canvas,50,30,i*50,j*30)
-        //         }
-        //     }
-        // }
-        // ctx.drawImage(fg,10,50, 50,  150);
-        // ctx.drawImage(pipeBottom, 200, 400);
         enemyKinematic.update(enemyOne);
-        enemyKinematic.calcNewCoord(enemyOne.person.width, enemyOne.person.height, (x0, x1, y0, y1, w, h) => {
+        enemyKinematic.calcNewCoord(enemyOne.person.width, enemyOne.person.height, (k, x1, y1, w, h) => {
             if (y1 + enemyOne.person.height <= canvas.height && y1 >= 0) {
                 if (x1 + enemyOne.person.width <= canvas.width && x1 >= 0) {
-                    return [x1, y1];
+                    k.x = x1;
+                    k.y = y1;
+                    return k;
                 }
                 else {
                     enemyOne.constHorizontalVelocity *= -1;
-                    return [x0, y1];
+                    k.y = y1;
+                    return k;
                 }
             }
             else {
                 if (x1 + enemyOne.person.width <= canvas.width && x1 >= 0) {
-                    return [x1, y0];
+                    k.x = x1;
+                    return k;
                 }
                 else {
                     enemyOne.constHorizontalVelocity *= -1;
-                    return [x0, y0];
+                    return k;
                 }
             }
         });
@@ -79,21 +57,25 @@ document.addEventListener('DOMContentLoaded', (event) => {
         enemyOne.calcVelocity();
         enemyOne.draw(ctx);
         userKinematic.update(user);
-        userKinematic.calcNewCoord(user.person.width, user.person.height, (x0, x1, y0, y1, w, h) => {
+        userKinematic.calcNewCoord(user.person.width, user.person.height, (k, x1, y1, w, h) => {
             if (y1 + user.person.height <= canvas.height && y1 >= 0) {
                 if (x1 + user.person.width <= canvas.width && x1 >= 0) {
-                    return [x1, y1];
+                    k.x = x1;
+                    k.y = y1;
+                    return k;
                 }
                 else {
-                    return [x0, y1];
+                    k.y = y1;
+                    return k;
                 }
             }
             else {
                 if (x1 + user.person.width <= canvas.width && x1 >= 0) {
-                    return [x1, y0];
+                    k.x = x1;
+                    return k;
                 }
                 else {
-                    return [x0, y0];
+                    return k;
                 }
             }
         });
@@ -114,7 +96,7 @@ function generatePlayer() {
         verticalBoost: 0, horizontalVelocity: 0, verticalVelocity: 0,
         bodyWeight: 2, currentIndexPicture: 0, speedPictureChange: 2 }, userTabs, { helth: 100, isDead: false,
         maxHelth: 100, minHelth: 0 });
-    const userKinematic = new Kinematics(user, 0.3, 0.3);
+    const userKinematic = new Kinematics(user, 0.03, 0.03);
     return [user, userKinematic];
 }
 function generateEnemy() {
@@ -136,7 +118,7 @@ function drawBg(bg, ctx, canvas) {
     const areaHeight = canvas.height;
     ctx.fillRect(0, 0, areaWidth, areaHeight);
 }
-function drawStaticStone(obj, ctx, canvas, width, height, x0, y0) {
+function drawStaticStone(obj, ctx, _canvas, width, height, x0, y0) {
     const pattern = ctx.createPattern(obj, 'repeat');
     ctx.fillStyle = pattern;
     const areaWidth = width;

@@ -3,19 +3,24 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _MapField_instances, _MapField_studyAreaForHumanOnBuild;
+var _MapField_instances, _MapField_studyAreaForHumanOnBuild, _MapField_setFrontAngular;
 export var Material;
 (function (Material) {
     Material[Material["Air"] = 0] = "Air";
     Material[Material["StaticStone"] = 1] = "StaticStone";
     Material[Material["ElasticStone"] = 2] = "ElasticStone";
-    Material[Material["DinamicNotElasticStone"] = 3] = "DinamicNotElasticStone";
-    Material[Material["DinamicElasticStone"] = 4] = "DinamicElasticStone";
-    Material[Material["Medecine"] = 5] = "Medecine";
-    Material[Material["Dangerous"] = 6] = "Dangerous";
-    Material[Material["Enemy"] = 7] = "Enemy";
-    Material[Material["Player"] = 8] = "Player";
+    Material[Material["DinamicicStone"] = 3] = "DinamicicStone";
+    Material[Material["Medecine"] = 4] = "Medecine";
+    Material[Material["Dangerous"] = 5] = "Dangerous";
+    Material[Material["Enemy"] = 6] = "Enemy";
+    Material[Material["Player"] = 7] = "Player";
 })(Material || (Material = {}));
+export class MaterialElastic {
+    constructor(elasticStone, dinamikStone) {
+        this.elasticStone = elasticStone;
+        this.dinamikStone = dinamikStone;
+    }
+}
 export class Block {
     constructor(material, xCoord, yCoord, xSize, ySize) {
         this.material = material;
@@ -26,7 +31,7 @@ export class Block {
     }
 }
 export class MapField {
-    constructor(width, height, widthStep, heightStep) {
+    constructor(width, height, widthStep, heightStep, elasticStone, dinamikStone) {
         _MapField_instances.add(this);
         this.width = width;
         this.height = height;
@@ -41,7 +46,11 @@ export class MapField {
                 this.mapFiels[i][j] = Material.Air;
             }
         }
-        this.secondSlice = [Material.Medecine, Material.Dangerous, Material.Enemy, Material.Player];
+        this.secondSlice = [Material.Medecine, Material.Dangerous, Material.Enemy, Material.Player,
+            Material.Air
+        ];
+        this.stopSlice = [Material.StaticStone, Material.Dangerous, Material.Enemy];
+        this.elasticMat = new MaterialElastic(elasticStone, dinamikStone);
     }
     ;
     convertFromPixel(x, y) {
@@ -55,11 +64,6 @@ export class MapField {
     shortConvertFromPixel(x, y) {
         let xCoord = Math.floor(x / this.widthStep);
         let yCoord = Math.floor(y / this.heightStep);
-        console.log(x, y);
-        console.log(this.widthStep, this.heightStep);
-        console.log(xCoord, yCoord);
-        console.log(x % this.widthStep, y % this.heightStep);
-        console.log();
         return [xCoord, yCoord];
     }
     ;
@@ -85,16 +89,48 @@ export class MapField {
             }
         }
         ;
-        console.log();
-        console.log();
-        console.log(RightUp[1], LeftDown[1], "y", LeftUp[0], RightDown[0], "x");
-        console.log(object_.yCoord, object_.yCoord + object_.ySize, "y", object_.xCoord, object_.xCoord + object_.xSize, "x");
-        console.log(...this.convertToPixel(...LeftUp, 10, 20, this.widthStep, this.heightStep), "y", ...this.convertToPixel(...RightDown, 10, 20, this.widthStep, this.heightStep), "x");
         return resoult;
+    }
+    calculateCollision(atThisMoment, x1, y1, width, height) {
+        let startPoint = this.convertFromPixel(atThisMoment.x, atThisMoment.y);
+        let potentialPoint = this.convertFromPixel(x1, y1);
+        if (startPoint[0] !== potentialPoint[0] && startPoint[1] !== potentialPoint[1]) {
+            let verticalLow = startPoint[1] <= potentialPoint[1];
+            let horizontalLow = startPoint[0] <= potentialPoint[0];
+            let equ = (startPoint[1] - potentialPoint[1]) / (startPoint[0] - potentialPoint[0]);
+            let lessStepDeviation;
+            let biggerStepDeviation;
+            if (equ >= 1) {
+                lessStepDeviation = 1;
+                biggerStepDeviation = Math.ceil(equ);
+            }
+            else {
+                equ = 1 / equ;
+                lessStepDeviation = Math.ceil(equ);
+                biggerStepDeviation = 1;
+            }
+            if (horizontalLow && verticalLow) {
+                let to = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y + height);
+                let toFin = this.convertFromPixel(x1 + width, y1 + height);
+                __classPrivateFieldGet(this, _MapField_instances, "m", _MapField_setFrontAngular).call(this, { startX: startPoint[0], startY: startPoint[1], step: biggerStepDeviation }, { startX: to[0], startY: to[1], step: lessStepDeviation }, verticalLow, horizontalLow);
+            }
+            else if (horizontalLow && !verticalLow) {
+                let st = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y);
+                let fin = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y);
+                // this.#setFrontAngular(startPoint[0],startPoint[1],potentialPoint[0],potentialPoint[1],
+                //     lessStepDeviation,biggerStepDeviation,verticalLow,horizontalLow);
+            }
+            else if (!horizontalLow && verticalLow) {
+                return 'a is false and b is true';
+            }
+            else {
+                return 'Both a and b are false';
+            }
+        }
     }
 }
 _MapField_instances = new WeakSet(), _MapField_studyAreaForHumanOnBuild = function _MapField_studyAreaForHumanOnBuild(RightUp, LeftUp, RightDown, LeftDown) {
-    for (let i = RightUp[1]; i < LeftDown[1]; i++) {
+    for (let i = LeftDown[1]; i < RightUp[1]; i++) {
         for (let j = LeftUp[0]; j < RightDown[0]; j++) {
             if (this.mapFiels[i][j] !== Material.Air) {
                 return false;
@@ -102,4 +138,18 @@ _MapField_instances = new WeakSet(), _MapField_studyAreaForHumanOnBuild = functi
         }
     }
     return true;
+}, _MapField_setFrontAngular = function _MapField_setFrontAngular(firstTrack, secondTrack, verticalLow, horizontalLow) {
+    if (horizontalLow && verticalLow) {
+        // return this.mapFiels[]
+        return 'Both a and b are true';
+    }
+    else if (horizontalLow && !verticalLow) {
+        return 'a is true and b is false';
+    }
+    else if (!horizontalLow && verticalLow) {
+        return 'a is false and b is true';
+    }
+    else {
+        return 'Both a and b are false';
+    }
 };

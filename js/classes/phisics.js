@@ -22,9 +22,8 @@ export class Kinematics {
     calcNewCoord(width, height, controlFunc) {
         let potentialX = __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_calcDeltaRoadX).call(this);
         let potentialY = __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_calcDeltaRoadY).call(this);
-        let newCoord = controlFunc(this.x, this.x + potentialX, this.y, this.y + potentialY, width, height);
-        this.x = newCoord[0];
-        this.y = newCoord[1];
+        let newData = controlFunc(this.getParams(), this.x + potentialX, this.y + potentialY, width, height);
+        this.update(newData);
         __classPrivateFieldGet(this, _Kinematics_instances, "m", _Kinematics_forceToZero).call(this);
     }
     getParams() {

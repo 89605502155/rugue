@@ -52,14 +52,14 @@ export class Kinematics{
         }
     }
 
-    calcNewCoord(width:number,height:number,controlFunc:(x0:number,x1:number,y0:number,y1:number,width:number,height:number)=>[number, number]){
+    calcNewCoord(width:number,height:number,controlFunc:(atThisMoment:KinematicInterface,x1:number,
+        y1:number,width:number,height:number)=>KinematicInterface){
         let potentialX=this.#calcDeltaRoadX();
         let potentialY=this.#calcDeltaRoadY();
-        let newCoord:[number,number]=controlFunc(this.x,this.x+potentialX,this.y,this.y+potentialY,
-            width,height
+        let newData:KinematicInterface=controlFunc(this.getParams(),this.x+potentialX,
+        this.y+potentialY,width,height
         );
-        this.x=newCoord[0];
-        this.y=newCoord[1];
+        this.update(newData)
         this.#forceToZero();
     }
     getParams():KinematicInterface{

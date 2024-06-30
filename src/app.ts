@@ -1,13 +1,13 @@
 import { Enemy } from "./classes/enemy.js";
 import { Block, MapField, Material } from "./classes/matrix.js";
 import { Kinematics } from "./classes/phisics.js";
-import { MoveTabs, User } from "./classes/user.js";
+import { KinematicInterface, MoveTabs, User } from "./classes/user.js";
 
 
-document.addEventListener('DOMContentLoaded', (event: Event) => {
+document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
     let ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-    let mapField:MapField= new MapField(canvas.width,canvas.height,50,30);
+    let mapField:MapField= new MapField(canvas.width,canvas.height,50,30,100,100);
     let stone:Block= new Block(Material.StaticStone,10,50,100,150);
     let isPaintStone:boolean= mapField.appendObjectBuild(stone)
 
@@ -41,20 +41,24 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
 
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord(enemyOne.person.width,enemyOne.person.height,
-            (x0,x1,y0,y1,w,h)=>{
+            (k:KinematicInterface,x1,y1,w,h):KinematicInterface=>{
             if (y1+enemyOne.person.height<=canvas.height && y1>=0){
                 if  (x1+enemyOne.person.width<=canvas.width && x1>=0){
-                    return [x1,y1]
+                    k.x=x1;
+                    k.y=y1;
+                    return k
                 } else {
                     enemyOne.constHorizontalVelocity*=-1;
-                    return [x0,y1]
+                    k.y=y1;
+                    return k
                 }
             } else {
                 if  (x1+enemyOne.person.width<=canvas.width && x1>=0){
-                    return [x1,y0]
+                    k.x=x1;
+                    return k
                 } else {
                     enemyOne.constHorizontalVelocity*=-1;
-                    return [x0,y0]
+                    return k
                 }
             }
         });
@@ -65,18 +69,22 @@ document.addEventListener('DOMContentLoaded', (event: Event) => {
         
         userKinematic.update(user)
         userKinematic.calcNewCoord(user.person.width,user.person.height,
-            (x0,x1,y0,y1,w,h)=>{
+            (k:KinematicInterface,x1,y1,w,h):KinematicInterface=>{
             if (y1+user.person.height<=canvas.height && y1>=0){
                 if  (x1+user.person.width<=canvas.width && x1>=0){
-                    return [x1,y1]
+                    k.x=x1;
+                    k.y=y1;
+                    return k
                 } else {
-                    return [x0,y1]
+                    k.y=y1;
+                    return k
                 }
             } else {
                 if  (x1+user.person.width<=canvas.width && x1>=0){
-                    return [x1,y0]
+                    k.x=x1;
+                    return k
                 } else {
-                    return [x0,y0]
+                    return k
                 }
             }
         })
@@ -98,7 +106,7 @@ function generatePlayer():[User,Kinematics] {
         verticalBoost:0,horizontalVelocity:0,verticalVelocity:0,
         bodyWeight:2,currentIndexPicture:0,speedPictureChange:2},userTabs,{helth:100,isDead:false,
             maxHelth:100,minHelth:0});
-    const userKinematic = new Kinematics(user,0.3,0.3)
+    const userKinematic = new Kinematics(user,0.03,0.03)
     return [user,userKinematic];
 }
 
@@ -122,7 +130,7 @@ function drawBg(bg: HTMLImageElement,ctx: CanvasRenderingContext2D,canvas: HTMLC
     const areaHeight = canvas.height;
     ctx.fillRect(0, 0, areaWidth, areaHeight);
 }
-function drawStaticStone(obj: HTMLImageElement,ctx: CanvasRenderingContext2D,canvas: HTMLCanvasElement,
+function drawStaticStone(obj: HTMLImageElement,ctx: CanvasRenderingContext2D,_canvas: HTMLCanvasElement,
     width:number,height:number,x0:number,y0:number
 ){
     const pattern = ctx.createPattern(obj, 'repeat') as CanvasPattern;

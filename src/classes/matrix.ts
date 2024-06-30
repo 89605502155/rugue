@@ -1,13 +1,22 @@
+import { KinematicInterface } from "./user.js";
+
 export enum Material{
     Air,
     StaticStone,
     ElasticStone,
-    DinamicNotElasticStone,
-    DinamicElasticStone,
+    DinamicicStone,
     Medecine,
     Dangerous,
     Enemy,
     Player,
+}
+export class MaterialElastic{
+    elasticStone:number;
+    dinamikStone:number;
+    constructor(elasticStone:number,dinamikStone:number){
+        this.elasticStone=elasticStone;
+        this.dinamikStone=dinamikStone;
+    }
 }
 export class Block{
     material:Material;
@@ -31,8 +40,12 @@ export class MapField {
     heightStep:number;
     newWith:number;
     newHeight:number;
-    secondSlice:Material[]
-    constructor(width:number,height:number,widthStep:number,heightStep:number){
+    secondSlice:Material[];
+    stopSlice:Material[];
+    elasticMat:MaterialElastic;
+    constructor(width:number,height:number,widthStep:number,heightStep:number,
+        elasticStone:number,dinamikStone:number
+    ){
         this.width=width;
         this.height=height;
         this.widthStep=widthStep;
@@ -49,6 +62,8 @@ export class MapField {
         this.secondSlice=[Material.Medecine,Material.Dangerous,Material.Enemy,Material.Player,
             Material.Air
         ];
+        this.stopSlice=[Material.StaticStone,Material.Dangerous,Material.Enemy];
+        this.elasticMat=new MaterialElastic(elasticStone,dinamikStone);
     }
     #studyAreaForHumanOnBuild(RightUp:[number,number],LeftUp:[number,number],RightDown:[number,number],
         LeftDown:[number,number]):boolean{
@@ -97,7 +112,58 @@ export class MapField {
         };
         return resoult;
     }
-    calculateCollision(x0:number,x1:number,y0:number,y1:number,w:number,h:number){
-        
+    #setFrontAngular(firstTrack:Track,secondTrack:Track,
+        verticalLow:boolean,horizontalLow:boolean
+    ){
+        if (horizontalLow && verticalLow) {
+            // return this.mapFiels[]
+            return 'Both a and b are true';
+        } else if (horizontalLow && !verticalLow) {
+            return 'a is true and b is false';
+        } else if (!horizontalLow && verticalLow) {
+            return 'a is false and b is true';
+        } else {
+            return 'Both a and b are false';
+        }
     }
+    calculateCollision(atThisMoment:KinematicInterface,x1:number,
+        y1:number,width:number,height:number){
+        let startPoint=this.convertFromPixel(atThisMoment.x,atThisMoment.y)
+        let potentialPoint=this.convertFromPixel(x1,y1);
+        if (startPoint[0]!==potentialPoint[0] && startPoint[1]!==potentialPoint[1]){
+            let verticalLow:boolean=startPoint[1]<=potentialPoint[1];
+            let horizontalLow:boolean=startPoint[0]<=potentialPoint[0];
+            let equ=(startPoint[1]-potentialPoint[1])/(startPoint[0]-potentialPoint[0])
+            let lessStepDeviation:number;
+            let biggerStepDeviation:number;
+            if (equ>=1){
+                lessStepDeviation=1;
+                biggerStepDeviation=Math.ceil(equ);
+            }else {
+                equ=1/equ;
+                lessStepDeviation=Math.ceil(equ);
+                biggerStepDeviation=1;
+            }
+            if (horizontalLow && verticalLow) {
+                let to = this.convertFromPixel(atThisMoment.x+width,atThisMoment.y+height)
+                let toFin = this.convertFromPixel(x1+width,y1+height)
+                this.#setFrontAngular({startX: startPoint[0],startY: startPoint[1], step:biggerStepDeviation},
+                    {startX:to[0],startY:to[1],step:lessStepDeviation},verticalLow,horizontalLow);
+            } else if (horizontalLow && !verticalLow) {
+                let st=this.convertFromPixel(atThisMoment.x+width,atThisMoment.y)
+                let fin =this.convertFromPixel(atThisMoment.x+width,atThisMoment.y)
+                // this.#setFrontAngular(startPoint[0],startPoint[1],potentialPoint[0],potentialPoint[1],
+                //     lessStepDeviation,biggerStepDeviation,verticalLow,horizontalLow);
+            } else if (!horizontalLow && verticalLow) {
+                return 'a is false and b is true';
+            } else {
+                return 'Both a and b are false';
+            }
+        }
+    }
+}
+export interface Track {
+    startX:number;
+    startY:number;
+    step:number;
 }
