@@ -171,10 +171,9 @@ export class MapField {
             
             let verticalLow:boolean=startPoint[1]<=potentialPoint[1];
             let horizontalLow:boolean=startPoint[0]<=potentialPoint[0];
-            let equ=(startPoint[1]-potentialPoint[1])/(startPoint[0]-potentialPoint[0])
+            let equ=Math.abs((startPoint[1]-potentialPoint[1])/(startPoint[0]-potentialPoint[0]));
             let lessStepDeviation:number;
             let biggerStepDeviation:number;
-
             if (equ>=1){
                 lessStepDeviation=1;
                 biggerStepDeviation=Math.ceil(equ);
@@ -183,6 +182,7 @@ export class MapField {
                 lessStepDeviation=Math.ceil(equ);
                 biggerStepDeviation=1;
             }
+            
             if ((horizontalLow && !verticalLow)||(!horizontalLow && verticalLow)) {
                 let to = this.convertFromPixel(atThisMoment.x+width,atThisMoment.y+height);
                 let toFin = this.convertFromPixel(x1+width,y1+height);
@@ -199,45 +199,125 @@ export class MapField {
                         atThisMoment.horizontalVelocity=0;
                         return atThisMoment;
                     }
+                    
                     if (objectsOnRoad.elasticStone!==0){
-                        atThisMoment.verticalVelocity-=(objectsOnRoad.elasticStone*this.elasticMat.elasticV);
-                        atThisMoment.horizontalVelocity-=(objectsOnRoad.elasticStone*this.elasticMat.elasticV);
-                        if (atThisMoment.verticalVelocity<=0){
-                            atThisMoment.verticalForce=(-1)*(objectsOnRoad.elasticStone*this.elasticMat.elasticA); 
-                        }
-                        if (atThisMoment.horizontalVelocity<=0){
-                            atThisMoment.horizontalForce=(-1)*(objectsOnRoad.elasticStone*this.elasticMat.elasticA);
-                        }
-                        if (atThisMoment.verticalVelocity<=0 || atThisMoment.horizontalVelocity<=0){
+                        atThisMoment=this.#elasticStoneCalculation(atThisMoment,objectsOnRoad);
+                        if (atThisMoment.verticalVelocity===0 || atThisMoment.horizontalVelocity===0){
                             return atThisMoment;
                         }
-                    }
-                    startPoint[1]+=biggerStepDeviation;
-                    to[1]+=biggerStepDeviation;
+                    };
                     if (!horizontalLow && verticalLow){
+                        startPoint[1]+=biggerStepDeviation;
+                        to[1]+=biggerStepDeviation;
                         startPoint[0]-=lessStepDeviation;
                         to[0]-=lessStepDeviation;
                     } else {
+                        startPoint[1]-=biggerStepDeviation;
+                        to[1]-=biggerStepDeviation;
                         startPoint[0]+=lessStepDeviation;
                         to[0]+=lessStepDeviation;
                     }
                     let renewCoord: [number, number]=this.convertToPixel(...startPoint);
-                    atThisMoment.x=renewCoord[0];
-                    atThisMoment.y=renewCoord[1];
+                    atThisMoment=this.#innerBorder(renewCoord,atThisMoment,width,height);
 
                 }
                 return atThisMoment;
                 
-            } else if (horizontalLow && verticalLow){
-                atThisMoment.x=x1;
-                atThisMoment.y=y1;
+            } else {
+                let to = this.convertFromPixel(atThisMoment.x,atThisMoment.y+height);
+                let toFin = this.convertFromPixel(x1,y1+height);
+                let fi = this.convertFromPixel(atThisMoment.x+width,atThisMoment.y);
+                // let toFi = this.convertFromPixel(x1+width,y1);
+                let m0:number=toFin[0]-to[0];
+                let m1:number=toFin[1]-to[1];
+                let num:number=Math.min(Math.abs(m0),Math.abs(m1));
+                for (let i=0;i<num+1;i++){
+                    objectsOnRoad=this.#setFrontAngular({startX: fi[0],startY: fi[1],
+                         step:biggerStepDeviation},{startX:to[0],startY:to[1],step:lessStepDeviation},
+                         verticalLow,horizontalLow,
+                    objectsOnRoad);
+                    if (objectsOnRoad.staticStone!==0 || objectsOnRoad.enemy!==0){
+                        atThisMoment.verticalVelocity=0;
+                        atThisMoment.horizontalVelocity=0;
+                        return atThisMoment;
+                    }
+                    
+                    if (objectsOnRoad.elasticStone!==0){
+                        atThisMoment=this.#elasticStoneCalculation(atThisMoment,objectsOnRoad);
+                        if (atThisMoment.verticalVelocity===0 || atThisMoment.horizontalVelocity===0){
+                            return atThisMoment;
+                        }
+                    };
+                    if (horizontalLow && verticalLow){
+                        fi[1]+=biggerStepDeviation;
+                        to[1]+=biggerStepDeviation;
+                        startPoint[1]+=biggerStepDeviation;
+                        startPoint[0]+=lessStepDeviation;
+                        fi[0]+=lessStepDeviation;
+                        to[0]+=lessStepDeviation;
+                    } else {
+                        fi[1]-=biggerStepDeviation;
+                        to[1]-=biggerStepDeviation;
+                        startPoint[1]-=biggerStepDeviation;
+                        startPoint[0]-=lessStepDeviation;
+                        fi[0]-=lessStepDeviation;
+                        to[0]-=lessStepDeviation;
+                    }
+                    let renewCoord: [number, number]=this.convertToPixel(...startPoint);
+                    atThisMoment=this.#innerBorder(renewCoord,atThisMoment,width,height);
+
+                }
                 return atThisMoment;
             }
+        }else {
+            atThisMoment=this.#innerBorder([x1,y1],atThisMoment,width,height);
+            return atThisMoment;
         }
-        atThisMoment.x=x1;
-        atThisMoment.y=y1;
+    };
+    #elasticStoneCalculation(atThisMoment: KinematicInterface,objectsOnRoad: NotBaseObjecs):KinematicInterface{
+        
+        [atThisMoment.verticalVelocity,atThisMoment.verticalForce]=this.#elasticStoneVectorCalculation(
+            atThisMoment.verticalVelocity,
+            objectsOnRoad.elasticStone,
+            atThisMoment.verticalForce);
+        
+        [atThisMoment.horizontalVelocity,atThisMoment.horizontalForce]=this.#elasticStoneVectorCalculation(
+            atThisMoment.horizontalVelocity,
+            objectsOnRoad.elasticStone,
+            atThisMoment.horizontalForce);
         return atThisMoment;
+    };
+    #elasticStoneVectorCalculation(velocity:number,elasticStone: number,force: number):[number,number]{
+        if (velocity>0){
+            velocity-=(elasticStone*this.elasticMat.elasticV);
+            if (velocity<=0){
+                force=(-1)*(elasticStone*this.elasticMat.elasticA); 
+                velocity=0;
+            }
+        } else if (velocity<0){
+            velocity+=(elasticStone*this.elasticMat.elasticV);
+            if (velocity>=0){
+                force=(elasticStone*this.elasticMat.elasticA); 
+                velocity=0;
+            }
+        }
+        return [velocity,force];
     }
+    #innerBorder(renewCoord: [number, number],atThisMoment: KinematicInterface,width_:number,
+        height_:number
+    ): KinematicInterface{
+        let wid:boolean=(renewCoord[0]+width_<=0.95*this.width && renewCoord[0]>=0)
+        let hei:boolean=(renewCoord[1]+height_<=0.95*this.height && renewCoord[1]>=0)
+        if (wid && hei){
+            atThisMoment.x=renewCoord[0];
+            atThisMoment.y=renewCoord[1];
+        } else if (wid  &&!hei){
+            atThisMoment.x=renewCoord[0];
+        } else if (!wid  && hei){
+            atThisMoment.y=renewCoord[1];
+        }
+        return atThisMoment;
+    };
 }
 export interface Track {
     startX:number;
