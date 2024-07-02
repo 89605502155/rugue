@@ -111,6 +111,29 @@ export class MapField {
         };
         return resoult;
     }
+    #setFrontRectangle(firstTrack:Track,secondTrack:Track,
+        noVerticalLow:boolean,noHorizontalLow:boolean,list: NotBaseObjecs
+    ): NotBaseObjecs{
+        console.log(this.mapFiels);
+        if (noVerticalLow && !noHorizontalLow){
+            console.log("lll ",firstTrack.startX,firstTrack.startX+secondTrack.step,firstTrack.startY,secondTrack.startY)
+            let i:number=firstTrack.startX+secondTrack.step;
+            console.log(this.mapFiels[i])
+            for (let j=firstTrack.startY;j <= secondTrack.startY;j++){
+                if (this.mapFiels[i][j]!==Material.Air) {
+                    list.append(this.mapFiels[i][j]);
+                }
+            }
+        } else {
+            let j:number=firstTrack.startY+firstTrack.step;
+            for (let i=firstTrack.startX;i<secondTrack.startX;i++){
+                if (this.mapFiels[i][j]!==Material.Air) {
+                    list.append(this.mapFiels[i][j]);
+                }
+            }
+        }
+        return list;
+    }
     #setFrontAngular(firstTrack:Track,secondTrack:Track,
         verticalLow:boolean,horizontalLow:boolean,list: NotBaseObjecs
     ): NotBaseObjecs{
@@ -166,14 +189,15 @@ export class MapField {
         let startPoint=this.convertFromPixel(atThisMoment.x,atThisMoment.y)
         let potentialPoint=this.convertFromPixel(x1,y1);
         let objectsOnRoad:NotBaseObjecs=new NotBaseObjecs();
+        let lessStepDeviation:number;
+        let biggerStepDeviation:number;
         
         if (startPoint[0]!==potentialPoint[0] && startPoint[1]!==potentialPoint[1]){
             
             let verticalLow:boolean=startPoint[1]<=potentialPoint[1];
             let horizontalLow:boolean=startPoint[0]<=potentialPoint[0];
             let equ=Math.abs((startPoint[1]-potentialPoint[1])/(startPoint[0]-potentialPoint[0]));
-            let lessStepDeviation:number;
-            let biggerStepDeviation:number;
+            
             if (equ>=1){
                 lessStepDeviation=1;
                 biggerStepDeviation=Math.ceil(equ);
@@ -270,9 +294,60 @@ export class MapField {
                 return atThisMoment;
             }
         }else {
+            let noVerticalLow:boolean=startPoint[1]===potentialPoint[1];
+            let noHorizontalLow:boolean=startPoint[0]===potentialPoint[0];
+            let to: [number, number, number, number, number, number];
+            let toFin: [number, number, number, number, number, number];
+            let fi: [number, number, number, number, number, number];
+            console.log("hhhhhh")
+            if (noVerticalLow && !noHorizontalLow){
+                console.log("jjjkkj")
+                biggerStepDeviation=0;
+                if (atThisMoment.horizontalVelocity>0){
+                    to = this.convertFromPixel(atThisMoment.x+width,atThisMoment.y+height);
+                    toFin = this.convertFromPixel(x1+width,y1+height);
+                    fi = this.convertFromPixel(atThisMoment.x+width,atThisMoment.y);
+                    lessStepDeviation=1;
+                }  else {
+                    to = this.convertFromPixel(atThisMoment.x,atThisMoment.y+height);
+                    toFin = this.convertFromPixel(x1,y1+height);
+                    fi=startPoint;
+                    lessStepDeviation=-1;
+                }  
+                let m0:number=toFin[0]-to[0];
+                let m1:number=toFin[1]-to[1];
+                let num:number=Math.min(Math.abs(m0),Math.abs(m1));
+                for (let i=0;i<num+1;i++){
+                    objectsOnRoad=this.#setFrontRectangle({startX: fi[0],startY: fi[1],
+                        step:biggerStepDeviation},{startX:to[0],startY:to[1],step:lessStepDeviation},
+                        noVerticalLow,noHorizontalLow,
+                   objectsOnRoad);
+                   console.log(objectsOnRoad);
+                    if (objectsOnRoad.staticStone!==0 || objectsOnRoad.enemy!==0){
+                        atThisMoment.verticalVelocity=0;
+                        atThisMoment.horizontalVelocity=0;
+                        return atThisMoment;
+                    }
+                
+                    if (objectsOnRoad.elasticStone!==0){
+                        atThisMoment=this.#elasticStoneCalculation(atThisMoment,objectsOnRoad);
+                        if (atThisMoment.verticalVelocity===0 || atThisMoment.horizontalVelocity===0){
+                            return atThisMoment;
+                        }
+                    };
+                    // startPoint[1]+=biggerStepDeviation;
+                    // to[1]+=biggerStepDeviation;
+                    startPoint[0]+=lessStepDeviation;
+                    to[0]+=lessStepDeviation;
+                    fi[0]+=lessStepDeviation;
+                };
+                atThisMoment=this.#innerBorder([x1,y1],atThisMoment,width,height);
+                return atThisMoment;
+            }
             atThisMoment=this.#innerBorder([x1,y1],atThisMoment,width,height);
             return atThisMoment;
         }
+    
     };
     #elasticStoneCalculation(atThisMoment: KinematicInterface,objectsOnRoad: NotBaseObjecs):KinematicInterface{
         
@@ -306,8 +381,8 @@ export class MapField {
     #innerBorder(renewCoord: [number, number],atThisMoment: KinematicInterface,width_:number,
         height_:number
     ): KinematicInterface{
-        let wid:boolean=(renewCoord[0]+width_<=0.95*this.width && renewCoord[0]>=0)
-        let hei:boolean=(renewCoord[1]+height_<=0.95*this.height && renewCoord[1]>=0)
+        let wid:boolean=(renewCoord[0]+width_<=0.95*this.width && renewCoord[0]>=0.02*this.width)
+        let hei:boolean=(renewCoord[1]+height_<=0.95*this.height && renewCoord[1]>=0.02*this.height)
         if (wid && hei){
             atThisMoment.x=renewCoord[0];
             atThisMoment.y=renewCoord[1];

@@ -3,7 +3,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _MapField_instances, _MapField_studyAreaForHumanOnBuild, _MapField_setFrontAngular, _MapField_elasticStoneCalculation, _MapField_elasticStoneVectorCalculation, _MapField_innerBorder;
+var _MapField_instances, _MapField_studyAreaForHumanOnBuild, _MapField_setFrontRectangle, _MapField_setFrontAngular, _MapField_elasticStoneCalculation, _MapField_elasticStoneVectorCalculation, _MapField_innerBorder;
 export var Material;
 (function (Material) {
     Material[Material["Air"] = 0] = "Air";
@@ -36,12 +36,12 @@ export class MapField {
             let startPoint = this.convertFromPixel(atThisMoment.x, atThisMoment.y);
             let potentialPoint = this.convertFromPixel(x1, y1);
             let objectsOnRoad = new NotBaseObjecs();
+            let lessStepDeviation;
+            let biggerStepDeviation;
             if (startPoint[0] !== potentialPoint[0] && startPoint[1] !== potentialPoint[1]) {
                 let verticalLow = startPoint[1] <= potentialPoint[1];
                 let horizontalLow = startPoint[0] <= potentialPoint[0];
                 let equ = Math.abs((startPoint[1] - potentialPoint[1]) / (startPoint[0] - potentialPoint[0]));
-                let lessStepDeviation;
-                let biggerStepDeviation;
                 if (equ >= 1) {
                     lessStepDeviation = 1;
                     biggerStepDeviation = Math.ceil(equ);
@@ -135,6 +135,56 @@ export class MapField {
                 }
             }
             else {
+                let noVerticalLow = startPoint[1] === potentialPoint[1];
+                let noHorizontalLow = startPoint[0] === potentialPoint[0];
+                let to;
+                let toFin;
+                let fi;
+                console.log("hhhhhh");
+                if (noVerticalLow && !noHorizontalLow) {
+                    console.log("jjjkkj");
+                    biggerStepDeviation = 0;
+                    if (atThisMoment.horizontalVelocity > 0) {
+                        to = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y + height);
+                        toFin = this.convertFromPixel(x1 + width, y1 + height);
+                        fi = this.convertFromPixel(atThisMoment.x + width, atThisMoment.y);
+                        lessStepDeviation = 1;
+                    }
+                    else {
+                        to = this.convertFromPixel(atThisMoment.x, atThisMoment.y + height);
+                        toFin = this.convertFromPixel(x1, y1 + height);
+                        fi = startPoint;
+                        lessStepDeviation = -1;
+                    }
+                    let m0 = toFin[0] - to[0];
+                    let m1 = toFin[1] - to[1];
+                    let num = Math.min(Math.abs(m0), Math.abs(m1));
+                    for (let i = 0; i < num + 1; i++) {
+                        objectsOnRoad = __classPrivateFieldGet(this, _MapField_instances, "m", _MapField_setFrontRectangle).call(this, { startX: fi[0], startY: fi[1],
+                            step: biggerStepDeviation }, { startX: to[0], startY: to[1], step: lessStepDeviation }, noVerticalLow, noHorizontalLow, objectsOnRoad);
+                        console.log(objectsOnRoad);
+                        if (objectsOnRoad.staticStone !== 0 || objectsOnRoad.enemy !== 0) {
+                            atThisMoment.verticalVelocity = 0;
+                            atThisMoment.horizontalVelocity = 0;
+                            return atThisMoment;
+                        }
+                        if (objectsOnRoad.elasticStone !== 0) {
+                            atThisMoment = __classPrivateFieldGet(this, _MapField_instances, "m", _MapField_elasticStoneCalculation).call(this, atThisMoment, objectsOnRoad);
+                            if (atThisMoment.verticalVelocity === 0 || atThisMoment.horizontalVelocity === 0) {
+                                return atThisMoment;
+                            }
+                        }
+                        ;
+                        // startPoint[1]+=biggerStepDeviation;
+                        // to[1]+=biggerStepDeviation;
+                        startPoint[0] += lessStepDeviation;
+                        to[0] += lessStepDeviation;
+                        fi[0] += lessStepDeviation;
+                    }
+                    ;
+                    atThisMoment = __classPrivateFieldGet(this, _MapField_instances, "m", _MapField_innerBorder).call(this, [x1, y1], atThisMoment, width, height);
+                    return atThisMoment;
+                }
                 atThisMoment = __classPrivateFieldGet(this, _MapField_instances, "m", _MapField_innerBorder).call(this, [x1, y1], atThisMoment, width, height);
                 return atThisMoment;
             }
@@ -209,6 +259,27 @@ _MapField_instances = new WeakSet(), _MapField_studyAreaForHumanOnBuild = functi
         }
     }
     return true;
+}, _MapField_setFrontRectangle = function _MapField_setFrontRectangle(firstTrack, secondTrack, noVerticalLow, noHorizontalLow, list) {
+    console.log(this.mapFiels);
+    if (noVerticalLow && !noHorizontalLow) {
+        console.log("lll ", firstTrack.startX, firstTrack.startX + secondTrack.step, firstTrack.startY, secondTrack.startY);
+        let i = firstTrack.startX + secondTrack.step;
+        console.log(this.mapFiels[i]);
+        for (let j = firstTrack.startY; j <= secondTrack.startY; j++) {
+            if (this.mapFiels[i][j] !== Material.Air) {
+                list.append(this.mapFiels[i][j]);
+            }
+        }
+    }
+    else {
+        let j = firstTrack.startY + firstTrack.step;
+        for (let i = firstTrack.startX; i < secondTrack.startX; i++) {
+            if (this.mapFiels[i][j] !== Material.Air) {
+                list.append(this.mapFiels[i][j]);
+            }
+        }
+    }
+    return list;
 }, _MapField_setFrontAngular = function _MapField_setFrontAngular(firstTrack, secondTrack, verticalLow, horizontalLow, list) {
     if (horizontalLow && !verticalLow) {
         for (let i = firstTrack.startX; i <= secondTrack.startX + secondTrack.step; i++) {
@@ -280,8 +351,8 @@ _MapField_instances = new WeakSet(), _MapField_studyAreaForHumanOnBuild = functi
     }
     return [velocity, force];
 }, _MapField_innerBorder = function _MapField_innerBorder(renewCoord, atThisMoment, width_, height_) {
-    let wid = (renewCoord[0] + width_ <= 0.95 * this.width && renewCoord[0] >= 0);
-    let hei = (renewCoord[1] + height_ <= 0.95 * this.height && renewCoord[1] >= 0);
+    let wid = (renewCoord[0] + width_ <= 0.95 * this.width && renewCoord[0] >= 0.02 * this.width);
+    let hei = (renewCoord[1] + height_ <= 0.95 * this.height && renewCoord[1] >= 0.02 * this.height);
     if (wid && hei) {
         atThisMoment.x = renewCoord[0];
         atThisMoment.y = renewCoord[1];
