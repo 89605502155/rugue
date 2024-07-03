@@ -8,8 +8,24 @@ document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
     let ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     let mapField:MapField= new MapField(canvas.width,canvas.height,50,30,100,100);
-    let stone:Block= new Block(Material.StaticStone,500,180,50,150);
+    let stone:Block= new Block(Material.StaticStone,500,10,50,150);
     let isPaintStone:boolean= mapField.appendObjectBuild(stone)
+
+    let stone2:Block= new Block(Material.StaticStone,1000,10,50,150);
+    mapField.appendObjectBuild(stone2)
+
+    let stone3:Block= new Block(Material.StaticStone,0,0,50,canvas.height);
+    mapField.appendObjectBuild(stone3)
+
+    let stone4:Block= new Block(Material.StaticStone,canvas.width-50,0,50,canvas.height);
+    mapField.appendObjectBuild(stone4)
+
+    let stone5:Block= new Block(Material.StaticStone,0,0,canvas.width,40);
+    mapField.appendObjectBuild(stone5)
+
+    let stone6:Block= new Block(Material.StaticStone,0,canvas.height-50,canvas.width,50);
+    mapField.appendObjectBuild(stone6)
+
 
     // console.log(mapField.mapFiels);
     let player = generatePlayer();
@@ -38,6 +54,11 @@ document.addEventListener('DOMContentLoaded', (_event: Event) => {
         drawBg(bg,ctx,canvas);
         // ctx.drawImage(bg, 0,0,canvas.width, canvas.height);
         drawStaticStone(fg,ctx,canvas,stone.xSize,stone.ySize,stone.xCoord,stone.yCoord) // 500,150,100,150
+        drawStaticStone(fg,ctx,canvas,stone2.xSize,stone2.ySize,stone2.xCoord,stone2.yCoord)
+        drawStaticStone(fg,ctx,canvas,stone3.xSize,stone3.ySize,stone3.xCoord,stone3.yCoord)
+        drawStaticStone(fg,ctx,canvas,stone4.xSize,stone4.ySize,stone4.xCoord,stone4.yCoord)
+        drawStaticStone(fg,ctx,canvas,stone5.xSize,stone5.ySize,stone5.xCoord,stone5.yCoord)
+        drawStaticStone(fg,ctx,canvas,stone6.xSize,stone6.ySize,stone6.xCoord,stone6.yCoord)
 
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord(enemyOne.person.width,enemyOne.person.height,
@@ -83,7 +104,7 @@ function generatePlayer():[User,Kinematics] {
     for (let i=0;i<6;i++){
         userSrc.push("images/player/tile-P-"+(i+1)+".png");
     }
-    const user: User = new User({roadToPicture:userSrc,x:10,
+    const user: User = new User({roadToPicture:userSrc,x:60,
         y:150,verticalForce:50, horizontalForce:50, horizontalBoost:0,
         verticalBoost:0,horizontalVelocity:0,verticalVelocity:0,
         bodyWeight:2,currentIndexPicture:0,speedPictureChange:2},userTabs,{helth:100,isDead:false,
