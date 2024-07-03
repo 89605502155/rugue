@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
     let ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     let mapField:MapField= new MapField(canvas.width,canvas.height,50,30,100,100);
-    let stone:Block= new Block(Material.StaticStone,500,150,100,150);
+    let stone:Block= new Block(Material.StaticStone,500,180,50,150);
     let isPaintStone:boolean= mapField.appendObjectBuild(stone)
 
     // console.log(mapField.mapFiels);
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', (_event: Event) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBg(bg,ctx,canvas);
         // ctx.drawImage(bg, 0,0,canvas.width, canvas.height);
-        drawStaticStone(fg,ctx,canvas,100,150,500,150)
+        drawStaticStone(fg,ctx,canvas,stone.xSize,stone.ySize,stone.xCoord,stone.yCoord) // 500,150,100,150
 
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord(enemyOne.person.width,enemyOne.person.height,

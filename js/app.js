@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', (_event) => {
     const canvas = document.getElementById('myCanvas');
     let ctx = canvas.getContext("2d");
     let mapField = new MapField(canvas.width, canvas.height, 50, 30, 100, 100);
-    let stone = new Block(Material.StaticStone, 500, 150, 100, 150);
+    let stone = new Block(Material.StaticStone, 500, 180, 50, 150);
     let isPaintStone = mapField.appendObjectBuild(stone);
     // console.log(mapField.mapFiels);
     let player = generatePlayer();
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', (_event) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBg(bg, ctx, canvas);
         // ctx.drawImage(bg, 0,0,canvas.width, canvas.height);
-        drawStaticStone(fg, ctx, canvas, 100, 150, 500, 150);
+        drawStaticStone(fg, ctx, canvas, stone.xSize, stone.ySize, stone.xCoord, stone.yCoord); // 500,150,100,150
         enemyKinematic.update(enemyOne);
         enemyKinematic.calcNewCoord(enemyOne.person.width, enemyOne.person.height, (k, x1, y1, w, h) => {
             if (y1 + enemyOne.person.height <= canvas.height && y1 >= 0) {
